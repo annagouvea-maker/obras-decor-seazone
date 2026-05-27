@@ -14,6 +14,9 @@ import { ChevronDown, ChevronRight, Search, Camera } from "lucide-react";
 const DRIVE_FOTOS_URL = "https://drive.google.com/drive/folders/1U0PxtQeuURhOY-aFoD0TZvh8WwSkGs61";
 
 export const Route = createFileRoute("/obras")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    status: typeof search.status === "string" ? search.status : "todos",
+  }),
   head: () => ({
     meta: [
       { title: "Obras — Seazone Decor" },
@@ -24,8 +27,9 @@ export const Route = createFileRoute("/obras")({
 });
 
 function ObrasPage() {
+  const { status: statusParam } = Route.useSearch();
   const [empFilter, setEmpFilter] = useState("todos");
-  const [statusFilter, setStatusFilter] = useState("todos");
+  const [statusFilter, setStatusFilter] = useState(statusParam);
   const [admFilter, setAdmFilter] = useState("todos");
   const [search, setSearch] = useState("");
   const [expanded, setExpanded] = useState<string | null>(null);

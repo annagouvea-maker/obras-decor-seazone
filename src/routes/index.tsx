@@ -1,13 +1,13 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMemo } from "react";
 import { AppShell, StatusBadge } from "@/components/layout/AppShell";
-import { Card } from "@/components/ui/card";
 import { EMPREENDIMENTOS, unidadeSlug } from "@/data/seazone";
 import { useSheetData } from "@/hooks/useSheetData";
 import {
-  BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, Cell, PieChart, Pie, Legend,
+  BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, Cell,
+  PieChart, Pie, Legend,
 } from "recharts";
-import { AlertTriangle, AlertCircle } from "lucide-react";
+import { AlertTriangle, AlertCircle, TrendingUp } from "lucide-react";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -19,57 +19,61 @@ export const Route = createFileRoute("/")({
   component: VisaoGeral,
 });
 
-function toneClass(tone: string) {
-  switch (tone) {
-    case "atencao": return "text-status-atencao";
-    case "atrasada": return "text-status-atrasada";
-    case "em-dia": return "text-status-em-dia";
-    default: return "text-foreground";
-  }
+// Uma cor por empreendimento
+const EMP_COLORS: Record<string, string> = {
+  "Urubici Spot":     "#fc605b",
+  "Penha Spot":       "#4A90D9",
+  "MOV Perdizes":     "#27AE60",
+  "House Espatódeas": "#F7B731",
+  "House Graça":      "#A55EEA",
+};
+function empColor(nome: string) {
+  return EMP_COLORS[nome] ?? "#00153e";
 }
 
 function VisaoGeral() {
   const { unidades } = useSheetData();
+  const navigate = useNavigate();
 
-  const kpis = useMemo(() => {
-    const total = unidades.length;
+  const stats = useMemo(() => {
+    const total      = unidades.length;
     const concluidas = unidades.filter((u) => u.status === "Concluída").length;
-    const emObra = total - concluidas;
-    const avgPct = total > 0 ? Math.round(unidades.reduce((s, u) => s + u.percentual, 0) / total) : 0;
-    const atencao = unidades.filter((u) => u.status === "Atenção Prazo").length;
-    const atrasada = unidades.filter((u) => u.status === "Atrasada").length;
-    const emDia = unidades.filter((u) => u.status === "Em Dia").length;
-    return [
-      { label: "Unidades em Obra", value: String(emObra), tone: "default" },
-      { label: "Concluídas", value: String(concluidas), tone: "default" },
-      { label: "Avanço Médio", value: `${avgPct}%`, tone: "default" },
-      { label: "Atenção: Prazo", value: String(atencao), tone: "atencao" },
-      { label: "Obras Atrasadas", value: String(atrasada), tone: "atrasada" },
-      { label: "Em Dia", value: String(emDia), tone: "em-dia" },
-    ] as { label: string; value: string; tone: string }[];
+    const emObra     = total - concluidas;
+    const emDia      = unidades.filter((u) => u.status === "Em Dia").length;
+    const atencao    = unidades.filter((u) => u.status === "Atenção Prazo").length;
+    const atrasada   = unidades.filter((u) => u.status === "Atrasada").length;
+    return { total, concluidas, emObra, emDia, atencao, atrasada };
   }, [unidades]);
+
+  const kpiCards = [
+    { label: "Unidades em Obra", value: stats.emObra,    dotColor: "bg-[#00153e]",    textColor: "#00153e", filter: "todos"        },
+    { label: "Concluídas",       value: stats.concluidas, dotColor: "bg-slate-400",   textColor: "#6B7280", filter: "Concluída"    },
+    { label: "Em Dia",           value: stats.emDia,      dotColor: "bg-emerald-500", textColor: "#059669", filter: "Em Dia"       },
+    { label: "Atenção Prazo",    value: stats.atencao,    dotColor: "bg-amber-400",   textColor: "#D97706", filter: "Atenção Prazo"},
+    { label: "Atrasadas",        value: stats.atrasada,   dotColor: "bg-red-500",     textColor: "#DC2626", filter: "Atrasada"     },
+  ];
 
   const progressoEmp = useMemo(
     () =>
       EMPREENDIMENTOS.map((nome) => {
         const units = unidades.filter((u) => u.empreendimento === nome);
-        const avg =
-          units.length > 0
-            ? Math.round(units.reduce((s, u) => s + u.percentual, 0) / units.length)
-            : 0;
+        const avg   = units.length > 0
+          ? Math.round(units.reduce((s, u) => s + u.percentual, 0) / units.length)
+          : 0;
         return { nome, valor: avg };
       }),
     [unidades],
   );
 
   const statusData = useMemo(
-    () => [
-      { name: "Em Dia",       value: unidades.filter((u) => u.status === "Em Dia").length,        color: "#24A148" },
-      { name: "Atenção Prazo",value: unidades.filter((u) => u.status === "Atenção Prazo").length,  color: "#F59E0B" },
-      { name: "Atrasada",     value: unidades.filter((u) => u.status === "Atrasada").length,       color: "#EF4444" },
-      { name: "Concluída",    value: unidades.filter((u) => u.status === "Concluída").length,      color: "#00153e" },
-    ],
-    [unidades],
+    () =>
+      [
+        { name: "Em Dia",        value: stats.emDia,      color: "#059669" },
+        { name: "Atenção Prazo", value: stats.atencao,    color: "#D97706" },
+        { name: "Atrasada",      value: stats.atrasada,   color: "#DC2626" },
+        { name: "Concluída",     value: stats.concluidas, color: "#94a3b8" },
+      ].filter((d) => d.value > 0),
+    [stats],
   );
 
   const alertas = useMemo(
@@ -79,84 +83,176 @@ function VisaoGeral() {
 
   return (
     <AppShell title="Visão Geral" subtitle="Acompanhamento consolidado dos empreendimentos">
-      <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4 mb-6">
-        {kpis.map((k) => (
-          <Card key={k.label} className="p-4">
-            <div className="text-xs text-muted-foreground font-medium">{k.label}</div>
-            <div className={`text-2xl font-semibold mt-2 tabular-nums ${toneClass(k.tone)}`}>{k.value}</div>
-          </Card>
+
+      {/* ── 5 KPI Cards clicáveis ─────────────────────────────────── */}
+      <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-4 mb-8">
+        {kpiCards.map((k) => (
+          <button
+            key={k.label}
+            onClick={() => navigate({ to: "/obras", search: { status: k.filter } })}
+            className="group bg-white rounded-2xl p-5 text-left shadow-sm border border-black/5 hover:shadow-md hover:-translate-y-0.5 transition-all duration-150"
+          >
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-[11px] font-semibold text-gray-400 uppercase tracking-wide leading-tight">
+                {k.label}
+              </span>
+              <span className={`h-2 w-2 rounded-full shrink-0 ${k.dotColor}`} />
+            </div>
+            <div className="text-3xl font-bold tabular-nums" style={{ color: k.textColor }}>
+              {k.value}
+            </div>
+            <div className="mt-2 text-[11px] text-gray-300 group-hover:text-gray-400 transition-colors">
+              Ver unidades →
+            </div>
+          </button>
         ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-        <Card className="p-5">
-          <h2 className="font-semibold text-foreground mb-1">Progresso por Empreendimento</h2>
-          <p className="text-xs text-muted-foreground mb-4">Percentual médio de execução</p>
-          <div className="h-72">
+      {/* ── Gráficos ──────────────────────────────────────────────── */}
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 mb-8">
+
+        {/* Barras finas — progresso por empreendimento */}
+        <div className="lg:col-span-3 bg-white rounded-2xl p-6 shadow-sm border border-black/5">
+          <div className="flex items-center gap-2 mb-1">
+            <TrendingUp className="h-4 w-4 text-[#00153e]" />
+            <h2 className="font-semibold text-[#00153e] text-sm">Progresso por Empreendimento</h2>
+          </div>
+          <p className="text-xs text-gray-400 mb-5">Percentual médio de execução</p>
+          <div className="h-52">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={progressoEmp} layout="vertical" margin={{ left: 20, right: 30 }}>
-                <XAxis type="number" domain={[0, 100]} tickFormatter={(v) => `${v}%`} fontSize={11} stroke="var(--muted-foreground)" />
-                <YAxis type="category" dataKey="nome" width={120} fontSize={11} stroke="var(--muted-foreground)" />
-                <Tooltip formatter={(v) => `${v}%`} cursor={{ fill: "var(--muted)" }} contentStyle={{ borderRadius: 8, border: "1px solid var(--border)", fontSize: 12 }} />
-                <Bar dataKey="valor" fill="#00153e" radius={[0, 4, 4, 0]} />
+              <BarChart
+                data={progressoEmp}
+                layout="vertical"
+                margin={{ left: 0, right: 36, top: 0, bottom: 0 }}
+                barCategoryGap="40%"
+              >
+                <XAxis
+                  type="number"
+                  domain={[0, 100]}
+                  tickFormatter={(v) => `${v}%`}
+                  fontSize={10}
+                  tick={{ fill: "#d1d5db" }}
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <YAxis
+                  type="category"
+                  dataKey="nome"
+                  width={135}
+                  fontSize={11}
+                  tick={{ fill: "#6b7280" }}
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <Tooltip
+                  formatter={(v) => [`${v}%`, "Progresso"]}
+                  cursor={{ fill: "#f9fafb" }}
+                  contentStyle={{
+                    borderRadius: 12,
+                    border: "1px solid #e5e7eb",
+                    fontSize: 12,
+                    boxShadow: "0 4px 16px rgba(0,0,0,0.06)",
+                  }}
+                />
+                <Bar dataKey="valor" radius={[0, 6, 6, 0]} barSize={8}>
+                  {progressoEmp.map((entry) => (
+                    <Cell key={entry.nome} fill={empColor(entry.nome)} />
+                  ))}
+                </Bar>
               </BarChart>
             </ResponsiveContainer>
           </div>
-        </Card>
+          {/* Legenda inline */}
+          <div className="mt-4 flex flex-wrap gap-x-4 gap-y-2">
+            {progressoEmp.map((e) => (
+              <span key={e.nome} className="flex items-center gap-1.5 text-[11px] text-gray-500">
+                <span className="h-2 w-2 rounded-full" style={{ backgroundColor: empColor(e.nome) }} />
+                {e.nome}
+              </span>
+            ))}
+          </div>
+        </div>
 
-        <Card className="p-5">
-          <h2 className="font-semibold text-foreground mb-1">Status das Obras</h2>
-          <p className="text-xs text-muted-foreground mb-4">Distribuição por situação</p>
-          <div className="h-72 flex items-center">
-            <ResponsiveContainer width="100%" height="100%">
+        {/* Donut — status */}
+        <div className="lg:col-span-2 bg-white rounded-2xl p-6 shadow-sm border border-black/5 flex flex-col">
+          <h2 className="font-semibold text-[#00153e] text-sm mb-1">Status das Obras</h2>
+          <p className="text-xs text-gray-400 mb-2">Distribuição por situação</p>
+          <div className="flex-1 min-h-0">
+            <ResponsiveContainer width="100%" height={220}>
               <PieChart>
-                <Pie data={statusData} dataKey="value" innerRadius={55} outerRadius={90} paddingAngle={2}>
-                  {statusData.map((s, i) => <Cell key={i} fill={s.color} />)}
+                <Pie
+                  data={statusData}
+                  dataKey="value"
+                  innerRadius={60}
+                  outerRadius={88}
+                  paddingAngle={3}
+                  strokeWidth={0}
+                >
+                  {statusData.map((s, i) => (
+                    <Cell key={i} fill={s.color} />
+                  ))}
                 </Pie>
-                <Tooltip contentStyle={{ borderRadius: 8, border: "1px solid var(--border)", fontSize: 12 }} />
-                <Legend iconType="circle" wrapperStyle={{ fontSize: 12 }} />
+                <Tooltip
+                  contentStyle={{
+                    borderRadius: 12,
+                    border: "1px solid #e5e7eb",
+                    fontSize: 12,
+                    boxShadow: "0 4px 16px rgba(0,0,0,0.06)",
+                  }}
+                />
+                <Legend
+                  iconType="circle"
+                  iconSize={8}
+                  wrapperStyle={{ fontSize: 11, color: "#6b7280" }}
+                />
               </PieChart>
             </ResponsiveContainer>
           </div>
-        </Card>
+        </div>
       </div>
 
-      <Card className="p-5">
-        <h2 className="font-semibold text-foreground mb-1">Obras que precisam de atenção</h2>
-        <p className="text-xs text-muted-foreground mb-4">{alertas.length} unidades requerem acompanhamento</p>
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
-          {alertas.map((u) => {
-            const atrasada = u.status === "Atrasada";
-            const Icon = atrasada ? AlertCircle : AlertTriangle;
-            return (
-              <Link
-                key={u.empreendimento + u.unidade}
-                to="/obras/$id"
-                params={{ id: unidadeSlug(u) }}
-                className={`block rounded-lg border p-4 bg-background hover:shadow-sm hover:border-primary/60 transition ${atrasada ? "border-status-atrasada/40" : "border-status-atencao/40"}`}
-              >
-                <div className="flex items-start justify-between gap-2">
-                  <div className="flex items-center gap-2">
-                    <Icon className={`h-4 w-4 ${atrasada ? "text-status-atrasada" : "text-status-atencao"}`} />
-                    <div className="font-medium text-sm text-foreground">{u.empreendimento} {u.unidade}</div>
+      {/* ── Alertas ───────────────────────────────────────────────── */}
+      {alertas.length > 0 && (
+        <div className="bg-white rounded-2xl p-6 shadow-sm border border-black/5">
+          <h2 className="font-semibold text-[#00153e] text-sm mb-1">Obras que precisam de atenção</h2>
+          <p className="text-xs text-gray-400 mb-5">
+            {alertas.length} unidade{alertas.length !== 1 ? "s" : ""} requerem acompanhamento
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+            {alertas.map((u) => {
+              const atrasada    = u.status === "Atrasada";
+              const Icon        = atrasada ? AlertCircle : AlertTriangle;
+              const accentColor = atrasada ? "#DC2626" : "#D97706";
+              return (
+                <Link
+                  key={u.empreendimento + u.unidade}
+                  to="/obras/$id"
+                  params={{ id: unidadeSlug(u) }}
+                  className={`block rounded-2xl border p-4 bg-white hover:shadow-sm transition-all duration-150 ${atrasada ? "border-red-100" : "border-amber-100"}`}
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      <Icon className="h-4 w-4 shrink-0" style={{ color: accentColor }} />
+                      <div className="font-semibold text-sm text-[#00153e]">
+                        {u.empreendimento}
+                        <span className="font-normal text-gray-400 ml-1 text-xs">{u.unidade}</span>
+                      </div>
+                    </div>
+                    <StatusBadge status={u.status} />
                   </div>
-                  <StatusBadge status={u.status} />
-                </div>
-                <div className="mt-3 flex items-center justify-between text-xs">
-                  <span className="text-muted-foreground">ADM: <span className="text-foreground font-medium">{u.adm}</span></span>
-                  <span className="font-semibold tabular-nums text-foreground">{u.percentual}%</span>
-                </div>
-                <div className="mt-2 h-1.5 rounded-full bg-muted overflow-hidden">
-                  <div className={`h-full ${atrasada ? "bg-status-atrasada" : "bg-status-atencao"}`} style={{ width: `${u.percentual}%` }} />
-                </div>
-                <div className={`mt-2 text-[11px] font-medium uppercase tracking-wide ${atrasada ? "text-status-atrasada" : "text-status-atencao"}`}>
-                  {atrasada ? "Obra atrasada" : "Atenção: prazo final"}
-                </div>
-              </Link>
-            );
-          })}
+                  <div className="mt-3 flex items-center justify-between text-xs">
+                    <span className="text-gray-400">ADM: <span className="text-gray-700 font-medium">{u.adm}</span></span>
+                    <span className="font-bold tabular-nums" style={{ color: accentColor }}>{u.percentual}%</span>
+                  </div>
+                  <div className="mt-2 h-1 rounded-full bg-gray-100 overflow-hidden">
+                    <div className="h-full rounded-full" style={{ width: `${u.percentual}%`, backgroundColor: accentColor }} />
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
         </div>
-      </Card>
+      )}
     </AppShell>
   );
 }
