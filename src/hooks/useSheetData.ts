@@ -132,6 +132,7 @@ function parseObrasRows(rows: string[][]): Unidade[] {
     // Início de nova unidade: col 0 tem um ID numérico diferente
     if (id && id !== currentId && /^\d+$/.test(id.replace(/[,. ]/g, ""))) {
       currentId = id;
+      const driveLink = (row[24] || "").trim(); // coluna Y — link da pasta de fotos da unidade
       currentUnit = {
         unidade: row[2],
         empreendimento: row[1],
@@ -141,6 +142,7 @@ function parseObrasRows(rows: string[][]): Unidade[] {
         status: parseStatusObra(row[21]),
         prazo: `${row[20] || "60"} dias`,
         percentual: 0,
+        driveUrl: driveLink || undefined,
       };
     }
 
