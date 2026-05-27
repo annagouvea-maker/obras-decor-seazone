@@ -28,10 +28,12 @@ const COMPRAS_SHEET_ID = "1nCmDK4k39qk449pZpP9FCYolzW7U17jv6IBtRxPaq3Q";
 // Para adicionar novos empreendimentos: copie o link da aba no Sheets,
 // pegue o gid= no final da URL e adicione aqui.
 const COMPRAS_TABS: { gid: string; empreendimento: string }[] = [
-  { gid: "271446938", empreendimento: "Urubici Spot" },
+  { gid: "271446938",  empreendimento: "Urubici Spot" },
+  { gid: "1620193194", empreendimento: "Penha Spot" },
+  { gid: "2075898158", empreendimento: "MOV Perdizes" },
   // Adicione as outras abas abaixo quando os GIDs forem identificados:
-  // { gid: "XXXXXXXXX", empreendimento: "Penha Spot" },
-  // { gid: "XXXXXXXXX", empreendimento: "MOV Perdizes" },
+  // { gid: "XXXXXXXXX", empreendimento: "House Espatódeas" },
+  // { gid: "XXXXXXXXX", empreendimento: "House Graça" },
 ];
 
 const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutos
