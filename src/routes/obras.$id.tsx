@@ -2,6 +2,7 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { AppShell, StatusBadge, ProgressBar } from "@/components/layout/AppShell";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import type { Unidade } from "@/data/seazone";
 import {
   unidadeBySlug,
   etapasParaUnidade,
@@ -50,7 +51,7 @@ export const Route = createFileRoute("/obras/$id")({
 });
 
 function UnidadeDetalhe() {
-  const { unidade: u } = Route.useLoaderData();
+  const { unidade: u } = Route.useLoaderData() as { unidade: Unidade };
   const etapas = etapasParaUnidade(u.percentual);
   const pacote = PACOTES[u.pacote];
   const person = personalizacaoUnidade(u);
