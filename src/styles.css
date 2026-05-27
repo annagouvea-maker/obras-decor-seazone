@@ -59,6 +59,18 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  --color-status-em-dia: var(--status-em-dia);
+  --color-status-atencao: var(--status-atencao);
+  --color-status-atrasada: var(--status-atrasada);
+  --color-status-andamento: var(--status-andamento);
+  --color-status-nao-iniciado: var(--status-nao-iniciado);
+  --color-status-concluida: var(--status-concluida);
+  --color-sidebar-dark: var(--sidebar-dark);
+  --color-sidebar-dark-foreground: var(--sidebar-dark-foreground);
+  --color-sidebar-dark-muted: var(--sidebar-dark-muted);
+  --color-sidebar-dark-border: var(--sidebar-dark-border);
+  --color-sidebar-dark-active: var(--sidebar-dark-active);
+  --font-sans: Inter, ui-sans-serif, system-ui, sans-serif;
 }
 
 :root {
