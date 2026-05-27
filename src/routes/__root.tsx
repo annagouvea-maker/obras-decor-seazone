@@ -72,14 +72,18 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
+      { title: "Obras Decor Seazone" },
+      { name: "description", content: "Dashboard para acompanhamento do progresso e cronogramas das obras Decor em tempo real." },
       { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { property: "og:title", content: "Obras Decor Seazone" },
+      { property: "og:description", content: "Dashboard para acompanhamento do progresso e cronogramas das obras Decor em tempo real." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "Obras Decor Seazone" },
+      { name: "twitter:description", content: "Dashboard para acompanhamento do progresso e cronogramas das obras Decor em tempo real." },
+      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/ADIdSBRmdjWwHnaxAh6qL5Vg0ii1/social-images/social-1779893409290-Logo_Seazone_Decor.webp" },
+      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/ADIdSBRmdjWwHnaxAh6qL5Vg0ii1/social-images/social-1779893409290-Logo_Seazone_Decor.webp" },
     ],
     links: [
       {
