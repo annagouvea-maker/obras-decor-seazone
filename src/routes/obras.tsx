@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
+import { Fragment } from "react";
 import { AppShell, StatusBadge, ProgressBar } from "@/components/layout/AppShell";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -100,9 +101,8 @@ function ObrasPage() {
                 const id = u.empreendimento + u.unidade;
                 const isOpen = expanded === id;
                 return (
-                  <>
+                  <Fragment key={id}>
                     <tr
-                      key={id}
                       className="border-t cursor-pointer hover:bg-muted/30 transition-colors"
                       onClick={() => setExpanded(isOpen ? null : id)}
                     >
@@ -135,7 +135,7 @@ function ObrasPage() {
                         </td>
                       </tr>
                     )}
-                  </>
+                  </Fragment>
                 );
               })}
             </tbody>
