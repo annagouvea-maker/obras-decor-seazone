@@ -128,3 +128,119 @@ export const ADMS = ["MOG", "Venture", "OES Construtora"];
 export function formatBRL(value: number): string {
   return value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 }
+
+// Slug helpers — usados para navegação até a página de detalhe da unidade
+export function unidadeSlug(u: { empreendimento: string; unidade: string }): string {
+  const norm = (s: string) =>
+    s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+  return `${norm(u.empreendimento)}-${norm(u.unidade)}`;
+}
+
+export function unidadeBySlug(slug: string): Unidade | undefined {
+  return UNIDADES.find((u) => unidadeSlug(u) === slug);
+}
+
+// Pacotes — escopo entregue por pacote
+export const PACOTES: Record<Unidade["pacote"], { descricao: string; itens: string[] }> = {
+  Essential: {
+    descricao: "Pacote base com mobiliário essencial e acabamento padrão Seazone.",
+    itens: [
+      "Pintura completa (2 demãos)",
+      "Mobiliário básico (sala, quarto, cozinha)",
+      "Eletrodomésticos essenciais",
+      "Cortinas blackout e linho",
+      "Iluminação padrão",
+    ],
+  },
+  Plus: {
+    descricao: "Pacote intermediário com upgrades em mobiliário e decoração.",
+    itens: [
+      "Tudo do pacote Essential",
+      "Mobiliário upgrade (sofá premium, mesa de jantar)",
+      "Decoração temática",
+      "Almofadas e quadros personalizados",
+      "Iluminação decorativa",
+    ],
+  },
+  Premium: {
+    descricao: "Pacote completo com curadoria de design e mobiliário premium.",
+    itens: [
+      "Tudo do pacote Plus",
+      "Marcenaria sob medida",
+      "Eletrodomésticos premium",
+      "Mármores e metais nobres",
+      "Curadoria de decoração assinada",
+      "Vistoria técnica reforçada",
+    ],
+  },
+};
+
+// Personalização — escolhas do investidor
+export interface Personalizacao {
+  paletaCores: string;
+  estilo: string;
+  observacoes: string;
+  itensExtras: string[];
+}
+
+export function personalizacaoUnidade(u: Unidade): Personalizacao {
+  // Personalização inferida do pacote
+  if (u.pacote === "Premium") {
+    return {
+      paletaCores: "Tons terrosos · Off-white · Detalhes em coral",
+      estilo: "Contemporâneo aconchegante",
+      observacoes: "Investidor solicitou acabamentos premium em todos os ambientes.",
+      itensExtras: ["Cabeceira estofada sob medida", "Tapete persa sala", "Quadros autorais"],
+    };
+  }
+  if (u.pacote === "Plus") {
+    return {
+      paletaCores: "Off-white · Slate · Detalhes em peach",
+      estilo: "Moderno minimalista",
+      observacoes: "Decoração com toques personalizados na sala e quarto principal.",
+      itensExtras: ["Almofadas estampadas", "Luminária pendente cozinha"],
+    };
+  }
+  return {
+    paletaCores: "Off-white · Slate",
+    estilo: "Essencial Seazone",
+    observacoes: "Pacote padrão sem personalização adicional contratada.",
+    itensExtras: [],
+  };
+}
+
+// Tarefas operacionais paralelas às etapas
+export interface Tarefa { titulo: string; responsavel: string; progresso: number; status: StatusEtapa; }
+
+export function tarefasUnidade(u: Unidade): Tarefa[] {
+  const p = u.percentual;
+  const f = (n: number): StatusEtapa => (n >= 100 ? "Finalizado" : n > 0 ? "Em Andamento" : "Não Iniciado");
+  const t = (base: number) => Math.min(100, Math.max(0, Math.round(p + base)));
+  return [
+    { titulo: "Aprovação de projeto", responsavel: "Equipe Decor", progresso: 100, status: "Finalizado" },
+    { titulo: "Pedido de compras", responsavel: u.adm, progresso: t(15), status: f(t(15)) },
+    { titulo: "Execução em obra", responsavel: u.adm, progresso: p, status: f(p) },
+    { titulo: "Vistoria interna", responsavel: "Equipe Decor", progresso: t(-25), status: f(t(-25)) },
+    { titulo: "Entrega final ao investidor", responsavel: "Anna", progresso: t(-40), status: f(t(-40)) },
+  ];
+}
+
+// Fotos de obra (URLs externas usadas apenas como ilustração interna)
+export const FOTOS_OBRA: { url: string; legenda: string }[] = [
+  { url: "https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=900&q=60", legenda: "Sala — pintura 2ª demão" },
+  { url: "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?auto=format&fit=crop&w=900&q=60", legenda: "Cozinha — marmoraria instalada" },
+  { url: "https://images.unsplash.com/photo-1493809842364-78817add7ffb?auto=format&fit=crop&w=900&q=60", legenda: "Quarto — decoração e mobiliário" },
+  { url: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=900&q=60", legenda: "Banheiro — metais Deca" },
+  { url: "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=900&q=60", legenda: "Vista geral pós-limpeza" },
+  { url: "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?auto=format&fit=crop&w=900&q=60", legenda: "Detalhe — luminárias" },
+];
+
+// Compras filtradas para uma unidade
+export function comprasDaUnidade(u: Unidade): Compra[] {
+  return COMPRAS.filter((c) => {
+    if (c.empreendimento !== "Todos" && c.empreendimento !== u.empreendimento) return false;
+    const lista = c.unidades.toLowerCase();
+    if (lista.includes("todas")) return true;
+    return lista.split(/[\s,]+/).some((x) => x === u.unidade);
+  });
+}
