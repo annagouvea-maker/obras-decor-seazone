@@ -3,7 +3,7 @@ import { useMemo, useState } from "react";
 import { AppShell, StatusBadge } from "@/components/layout/AppShell";
 import { Card } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { EMPREENDIMENTOS, UNIDADES, formatBRL } from "@/data/seazone";
+import { EMPREENDIMENTOS, formatBRL } from "@/data/seazone";
 import { useSheetData } from "@/hooks/useSheetData";
 
 export const Route = createFileRoute("/compras")({
@@ -22,11 +22,18 @@ function ComprasPage() {
   const [st, setSt] = useState("todos");
   const { compras } = useSheetData();
 
+  // Divide "403, 503 e 502" ou "101, 205, 208" em ["403","503","502"] etc.
+  function splitUnidades(raw: string): string[] {
+    return raw.split(/,\s*|\s+e\s+/).map((u) => u.trim()).filter(Boolean);
+  }
+
   const filtered = useMemo(() => {
     return compras.filter((c) => {
-      if (emp !== "todos" && c.empreendimento !== emp && c.empreendimento !== "Todos") return false;
-      if (un !== "todos" && !c.unidades.includes(un)) return false;
-      // Status simplificado: "Entregue" ou "Aguardando" (tudo que não é Entregue)
+      if (emp !== "todos" && c.empreendimento !== emp) return false;
+      if (un !== "todos") {
+        const lista = splitUnidades(c.unidades || "");
+        if (!lista.includes(un)) return false;
+      }
       if (st === "Entregue" && c.status !== "Entregue") return false;
       if (st === "Aguardando" && c.status === "Entregue") return false;
       return true;
@@ -49,7 +56,16 @@ function ComprasPage() {
     },
   ], [filtered]);
 
-  const unidadesUnicas = Array.from(new Set(UNIDADES.map((u) => u.unidade))).sort();
+  // Lista de unidades extraída dos próprios dados de compras (split de valores múltiplos)
+  const unidadesUnicas = useMemo(() => {
+    const set = new Set<string>();
+    compras.forEach((c) => {
+      splitUnidades(c.unidades || "").forEach((u) => set.add(u));
+    });
+    return Array.from(set).sort((a, b) =>
+      a.localeCompare(b, undefined, { numeric: true })
+    );
+  }, [compras]);
 
   return (
     <AppShell title="Compras" subtitle="Pedidos, fornecedores e prazos de entrega">
