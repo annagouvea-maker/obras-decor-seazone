@@ -91,9 +91,19 @@ function ComprasPage() {
 
       <Card className="overflow-hidden p-0">
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="w-full text-sm table-fixed">
+            <colgroup>
+              <col className="w-36" />       {/* Empreendimento */}
+              <col className="w-32" />       {/* Categoria */}
+              <col />                        {/* Produto — ocupa o restante */}
+              <col className="w-16" />       {/* Qtde */}
+              <col className="w-28" />       {/* Unidades */}
+              <col className="w-28" />       {/* Valor Total */}
+              <col className="w-28" />       {/* Status */}
+            </colgroup>
             <thead className="bg-muted/50 text-muted-foreground text-xs uppercase tracking-wide">
               <tr>
+                <th className="text-left font-medium px-4 py-3">Empreendimento</th>
                 <th className="text-left font-medium px-4 py-3">Categoria</th>
                 <th className="text-left font-medium px-4 py-3">Produto</th>
                 <th className="text-right font-medium px-4 py-3">Qtde</th>
@@ -105,10 +115,11 @@ function ComprasPage() {
             <tbody>
               {filtered.map((c, i) => (
                 <tr key={c.codigo || i} className="border-t hover:bg-muted/30 transition-colors">
-                  <td className="px-4 py-3 text-muted-foreground">{c.categoria || "—"}</td>
-                  <td className="px-4 py-3 font-medium text-foreground">{c.produto}</td>
+                  <td className="px-4 py-3 text-muted-foreground truncate" title={c.empreendimento}>{c.empreendimento || "—"}</td>
+                  <td className="px-4 py-3 text-muted-foreground truncate" title={c.categoria}>{c.categoria || "—"}</td>
+                  <td className="px-4 py-3 font-medium text-foreground truncate" title={c.produto}>{c.produto}</td>
                   <td className="px-4 py-3 text-right tabular-nums text-foreground">{c.qtde}</td>
-                  <td className="px-4 py-3 text-muted-foreground max-w-[200px] truncate" title={c.unidades}>{c.unidades}</td>
+                  <td className="px-4 py-3 text-muted-foreground truncate" title={c.unidades}>{c.unidades}</td>
                   <td className="px-4 py-3 text-right tabular-nums font-medium text-foreground">{formatBRL(c.valorTotal)}</td>
                   <td className="px-4 py-3">
                     <StatusBadge status={c.status === "Entregue" ? "Entregue" : "Aguardando"} />
@@ -117,7 +128,7 @@ function ComprasPage() {
               ))}
               {filtered.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="px-4 py-8 text-center text-sm text-muted-foreground">
+                  <td colSpan={7} className="px-4 py-8 text-center text-sm text-muted-foreground">
                     Nenhuma compra encontrada com os filtros selecionados.
                   </td>
                 </tr>

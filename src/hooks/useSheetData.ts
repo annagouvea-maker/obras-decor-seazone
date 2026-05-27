@@ -60,9 +60,13 @@ async function fetchRows(sheetId: string, gid: string): Promise<string[][]> {
   if (start === -1 || end === -1) throw new Error("Formato inesperado da API Google Sheets");
 
   const json = JSON.parse(text.slice(start, end + 1));
-  const tableRows: any[] = json?.table?.rows ?? [];
 
-  return tableRows.map((row: any) => {
+  // Os cabeçalhos ficam nos metadados `cols`, não nas linhas de dados.
+  // Incluímos como primeira linha para que os parsers consigam detectar índices.
+  const cols: string[] = (json?.table?.cols ?? []).map((c: any) => (c.label || "").trim());
+
+  const tableRows: any[] = json?.table?.rows ?? [];
+  const dataRows = tableRows.map((row: any) => {
     const cells: (any | null)[] = row?.c ?? [];
     return cells.map((cell: any) => {
       if (!cell || cell.v === null || cell.v === undefined) return "";
@@ -71,6 +75,8 @@ async function fetchRows(sheetId: string, gid: string): Promise<string[][]> {
       return String(cell.v).trim();
     });
   });
+
+  return cols.length > 0 ? [cols, ...dataRows] : dataRows;
 }
 
 function getCache<T>(key: string): T | null {
