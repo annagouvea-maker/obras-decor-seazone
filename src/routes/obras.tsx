@@ -124,7 +124,7 @@ function ObrasPage() {
                       <td className="px-4 py-3"><StatusBadge status={u.status} /></td>
                       <td
                         className="px-4 py-3 text-right"
-                        onClick={(e) => { e.stopPropagation(); window.open(DRIVE_FOTOS_URL, "_blank"); }}
+                        onClick={(e) => { e.stopPropagation(); window.open(u.driveUrl || DRIVE_FOTOS_URL, "_blank"); }}
                       >
                         <span className="inline-flex items-center gap-1 text-primary text-xs font-medium cursor-pointer hover:underline">
                           Fotos <Camera className="h-3.5 w-3.5" />

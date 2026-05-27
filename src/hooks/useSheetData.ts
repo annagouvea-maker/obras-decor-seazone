@@ -96,10 +96,13 @@ function setCache<T>(key: string, data: T): void {
 
 // ─── Parser de Obras ─────────────────────────────────────────────────────────
 function parseStatusObra(raw: string): StatusObra {
-  if (raw.includes("ATRASADA") || raw.includes("🔴")) return "Atrasada";
-  if (raw.includes("ATENÇÃO") || raw.includes("⚠️")) return "Atenção Prazo";
-  if (raw.includes("EM DIA") || raw.includes("✅")) return "Em Dia";
-  if (raw.includes("CONCLUÍDA") || raw.includes("CONCLUIDA")) return "Concluída";
+  // Normaliza para maiúsculo sem acento para comparação robusta
+  const up = raw.toUpperCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+  // Concluída primeiro — "CONCLUIDA COM ATRASO" não deve virar "Atrasada"
+  if (up.includes("CONCLU") || up.includes("FINALIZ") || up.includes("ENTREGUE")) return "Concluída";
+  if (up.includes("ATRASAD") || raw.includes("🔴")) return "Atrasada";
+  if (up.includes("ATENCAO") || up.includes("ATENÇAO") || raw.includes("⚠️")) return "Atenção Prazo";
+  if (up.includes("EM DIA") || raw.includes("✅")) return "Em Dia";
   return "Em Dia";
 }
 
@@ -182,39 +185,60 @@ function parseBRL(str: string): number {
 function parseComprasRows(rows: string[][], empreendimento: string): Compra[] {
   const compras: Compra[] = [];
   let headerIdx = -1;
+  let produtoIdx = 2; // padrão: Coluna C (com Categoria em B)
 
-  // Encontrar a linha de cabeçalho (contém "Produto" ou "Título Sienge")
+  // Encontrar a linha de cabeçalho — busca "Produto" em qualquer coluna inicial
   for (let i = 0; i < rows.length; i++) {
-    if (rows[i][1] === "Produto" || rows[i][0] === "Título Sienge") {
+    const row = rows[i];
+    const pIdx = row.findIndex((cell, j) => j <= 6 && cell.trim() === "Produto");
+    if (pIdx >= 0) {
+      headerIdx = i;
+      produtoIdx = pIdx;
+      break;
+    }
+    if (row[0] === "Título Sienge") {
       headerIdx = i;
       break;
     }
   }
 
+  // Detectar índice da coluna Categoria no cabeçalho
+  const headerRow = headerIdx >= 0 ? rows[headerIdx] : [];
+  const catIdx = headerRow.findIndex((c) =>
+    c.trim().toLowerCase().includes("categor")
+  );
+
+  // Índices relativos ao Produto (estrutura consistente independente de onde "Produto" está)
+  const qtdeIdx    = produtoIdx + 5;  // Qtde
+  const valorIdx   = produtoIdx + 7;  // Valor Total
+  const prazoIdx   = produtoIdx + 19; // Prazo de entrega
+  const fornIdx    = produtoIdx + 24; // Fornecedor
+
   const dataRows = headerIdx >= 0 ? rows.slice(headerIdx + 1) : rows;
   let counter = 1;
 
   for (const row of dataRows) {
-    // Pular linhas sem produto
-    const produto = (row[1] || "").trim();
+    while (row.length < 35) row.push("");
+
+    const produto = (row[produtoIdx] || "").trim();
     if (!produto) continue;
-    // Pular se parece ser outra linha de cabeçalho ou empreendimento
     if (produto === "Produto" || produto.includes("Empreendimento:")) continue;
 
-    const valorTotal = parseBRL(row[8]);
-    const qtde = parseFloat((row[6] || "1").replace(",", ".")) || 1;
-    const prazo = (row[20] || "").trim();
+    const valorTotal = parseBRL(row[valorIdx]);
+    const qtde = parseFloat((row[qtdeIdx] || "1").replace(",", ".")) || 1;
+    const prazo = (row[prazoIdx] || "").trim();
 
     compras.push({
       codigo: row[0] || `C${String(counter).padStart(3, "0")}`,
+      categoria: catIdx >= 0 ? (row[catIdx] || "").trim() : "",
       produto,
-      especificacoes: (row[2] || "").trim(),
-      unidades: (row[3] || "").trim(),
+      especificacoes: (row[produtoIdx + 1] || "").trim(),
+      unidades: (row[produtoIdx + 2] || "").trim(),
       qtde,
       valorTotal,
       prazoEntrega: prazo,
       status: parseStatusEntrega(prazo),
-      fornecedor: (row[25] || "").trim(), // coluna Dados do Fornecedor
+      fornecedor: (row[fornIdx] || "").trim(),
       empreendimento,
     });
     counter++;

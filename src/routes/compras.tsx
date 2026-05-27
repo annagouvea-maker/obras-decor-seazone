@@ -26,26 +26,34 @@ function ComprasPage() {
     return compras.filter((c) => {
       if (emp !== "todos" && c.empreendimento !== emp && c.empreendimento !== "Todos") return false;
       if (un !== "todos" && !c.unidades.includes(un)) return false;
-      if (st !== "todos" && c.status !== st) return false;
+      // Status simplificado: "Entregue" ou "Aguardando" (tudo que não é Entregue)
+      if (st === "Entregue" && c.status !== "Entregue") return false;
+      if (st === "Aguardando" && c.status === "Entregue") return false;
       return true;
     });
   }, [compras, emp, un, st]);
 
+  // KPIs calculados sobre os itens filtrados
   const kpis = useMemo(() => [
-    { label: "Total de Itens", value: String(compras.length) },
-    { label: "Valor Total Investido", value: formatBRL(compras.reduce((s, c) => s + c.valorTotal, 0)) },
     {
-      label: "Aguardando Entrega",
-      value: `${compras.filter((c) => c.status === "Previsto" || c.status === "Pendente").length} itens`,
+      label: "Valor Total Gasto",
+      value: formatBRL(filtered.reduce((s, c) => s + c.valorTotal, 0)),
     },
-    { label: "Entregues", value: `${compras.filter((c) => c.status === "Entregue").length} itens` },
-  ], [compras]);
+    {
+      label: "Aguardando",
+      value: `${filtered.filter((c) => c.status !== "Entregue").length} itens`,
+    },
+    {
+      label: "Entregues",
+      value: `${filtered.filter((c) => c.status === "Entregue").length} itens`,
+    },
+  ], [filtered]);
 
   const unidadesUnicas = Array.from(new Set(UNIDADES.map((u) => u.unidade))).sort();
 
   return (
     <AppShell title="Compras" subtitle="Pedidos, fornecedores e prazos de entrega">
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         {kpis.map((k) => (
           <Card key={k.label} className="p-4">
             <div className="text-xs text-muted-foreground font-medium">{k.label}</div>
@@ -71,13 +79,11 @@ function ComprasPage() {
             </SelectContent>
           </Select>
           <Select value={st} onValueChange={setSt}>
-            <SelectTrigger><SelectValue placeholder="Status Entrega" /></SelectTrigger>
+            <SelectTrigger><SelectValue placeholder="Status" /></SelectTrigger>
             <SelectContent>
               <SelectItem value="todos">Todos os status</SelectItem>
               <SelectItem value="Entregue">Entregue</SelectItem>
-              <SelectItem value="Previsto">Previsto</SelectItem>
-              <SelectItem value="Pendente">Pendente</SelectItem>
-              <SelectItem value="Atrasado">Atrasado</SelectItem>
+              <SelectItem value="Aguardando">Aguardando</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -88,30 +94,30 @@ function ComprasPage() {
           <table className="w-full text-sm">
             <thead className="bg-muted/50 text-muted-foreground text-xs uppercase tracking-wide">
               <tr>
-                <th className="text-left font-medium px-4 py-3">Cód</th>
+                <th className="text-left font-medium px-4 py-3">Categoria</th>
                 <th className="text-left font-medium px-4 py-3">Produto</th>
-                <th className="text-left font-medium px-4 py-3">Unidades</th>
                 <th className="text-right font-medium px-4 py-3">Qtde</th>
+                <th className="text-left font-medium px-4 py-3">Unidades</th>
                 <th className="text-right font-medium px-4 py-3">Valor Total</th>
-                <th className="text-left font-medium px-4 py-3">Prazo Entrega</th>
                 <th className="text-left font-medium px-4 py-3">Status</th>
               </tr>
             </thead>
             <tbody>
-              {filtered.map((c) => (
-                <tr key={c.codigo} className="border-t hover:bg-muted/30 transition-colors">
-                  <td className="px-4 py-3 font-mono text-xs text-muted-foreground">{c.codigo}</td>
+              {filtered.map((c, i) => (
+                <tr key={c.codigo || i} className="border-t hover:bg-muted/30 transition-colors">
+                  <td className="px-4 py-3 text-muted-foreground">{c.categoria || "—"}</td>
                   <td className="px-4 py-3 font-medium text-foreground">{c.produto}</td>
-                  <td className="px-4 py-3 text-muted-foreground max-w-[200px] truncate" title={c.unidades}>{c.unidades}</td>
                   <td className="px-4 py-3 text-right tabular-nums text-foreground">{c.qtde}</td>
+                  <td className="px-4 py-3 text-muted-foreground max-w-[200px] truncate" title={c.unidades}>{c.unidades}</td>
                   <td className="px-4 py-3 text-right tabular-nums font-medium text-foreground">{formatBRL(c.valorTotal)}</td>
-                  <td className="px-4 py-3 text-muted-foreground">{c.prazoEntrega}</td>
-                  <td className="px-4 py-3"><StatusBadge status={c.status} /></td>
+                  <td className="px-4 py-3">
+                    <StatusBadge status={c.status === "Entregue" ? "Entregue" : "Aguardando"} />
+                  </td>
                 </tr>
               ))}
               {filtered.length === 0 && (
                 <tr>
-                  <td colSpan={7} className="px-4 py-8 text-center text-sm text-muted-foreground">
+                  <td colSpan={6} className="px-4 py-8 text-center text-sm text-muted-foreground">
                     Nenhuma compra encontrada com os filtros selecionados.
                   </td>
                 </tr>

@@ -64,10 +64,10 @@ function VisaoGeral() {
 
   const statusData = useMemo(
     () => [
-      { name: "Em Dia", value: unidades.filter((u) => u.status === "Em Dia").length, color: "var(--status-em-dia)" },
-      { name: "Atenção Prazo", value: unidades.filter((u) => u.status === "Atenção Prazo").length, color: "var(--status-atencao)" },
-      { name: "Atrasada", value: unidades.filter((u) => u.status === "Atrasada").length, color: "var(--status-atrasada)" },
-      { name: "Concluída", value: unidades.filter((u) => u.status === "Concluída").length, color: "var(--status-concluida)" },
+      { name: "Em Dia",       value: unidades.filter((u) => u.status === "Em Dia").length,        color: "#24A148" },
+      { name: "Atenção Prazo",value: unidades.filter((u) => u.status === "Atenção Prazo").length,  color: "#F59E0B" },
+      { name: "Atrasada",     value: unidades.filter((u) => u.status === "Atrasada").length,       color: "#EF4444" },
+      { name: "Concluída",    value: unidades.filter((u) => u.status === "Concluída").length,      color: "#00153e" },
     ],
     [unidades],
   );
@@ -98,7 +98,7 @@ function VisaoGeral() {
                 <XAxis type="number" domain={[0, 100]} tickFormatter={(v) => `${v}%`} fontSize={11} stroke="var(--muted-foreground)" />
                 <YAxis type="category" dataKey="nome" width={120} fontSize={11} stroke="var(--muted-foreground)" />
                 <Tooltip formatter={(v) => `${v}%`} cursor={{ fill: "var(--muted)" }} contentStyle={{ borderRadius: 8, border: "1px solid var(--border)", fontSize: 12 }} />
-                <Bar dataKey="valor" fill="var(--primary)" radius={[0, 4, 4, 0]} />
+                <Bar dataKey="valor" fill="#00153e" radius={[0, 4, 4, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>

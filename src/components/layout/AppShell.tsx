@@ -29,6 +29,7 @@ export function StatusBadge({ status }: { status: string }) {
     "Previsto": { bg: "bg-status-andamento/10", fg: "text-status-andamento", dot: "bg-status-andamento", label: "Previsto" },
     "Pendente": { bg: "bg-status-nao-iniciado/10", fg: "text-status-nao-iniciado", dot: "bg-status-nao-iniciado", label: "Pendente" },
     "Atrasado": { bg: "bg-status-atrasada/10", fg: "text-status-atrasada", dot: "bg-status-atrasada", label: "Atrasado" },
+    "Aguardando": { bg: "bg-status-nao-iniciado/10", fg: "text-muted-foreground", dot: "bg-status-nao-iniciado", label: "Aguardando" },
   };
   const s = map[status] ?? map["Não Iniciado"];
   return (

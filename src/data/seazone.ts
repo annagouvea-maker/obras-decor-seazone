@@ -11,6 +11,7 @@ export interface Unidade {
   percentual: number;
   status: StatusObra;
   prazo: string;
+  driveUrl?: string; // link para a pasta de fotos desta unidade no Drive
 }
 
 export const ETAPAS_PADRAO = [
@@ -89,6 +90,7 @@ export const UNIDADES: Unidade[] = [
 
 export interface Compra {
   codigo: string;
+  categoria?: string;
   produto: string;
   especificacoes: string;
   unidades: string;
