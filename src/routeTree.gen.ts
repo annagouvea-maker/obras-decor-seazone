@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as ObrasRouteImport } from './routes/obras'
 import { Route as ComprasRouteImport } from './routes/compras'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ObrasIdRouteImport } from './routes/obras.$id'
 
 const ObrasRoute = ObrasRouteImport.update({
   id: '/obras',
@@ -28,35 +29,43 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ObrasIdRoute = ObrasIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => ObrasRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/compras': typeof ComprasRoute
-  '/obras': typeof ObrasRoute
+  '/obras': typeof ObrasRouteWithChildren
+  '/obras/$id': typeof ObrasIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/compras': typeof ComprasRoute
-  '/obras': typeof ObrasRoute
+  '/obras': typeof ObrasRouteWithChildren
+  '/obras/$id': typeof ObrasIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/compras': typeof ComprasRoute
-  '/obras': typeof ObrasRoute
+  '/obras': typeof ObrasRouteWithChildren
+  '/obras/$id': typeof ObrasIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/compras' | '/obras'
+  fullPaths: '/' | '/compras' | '/obras' | '/obras/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/compras' | '/obras'
-  id: '__root__' | '/' | '/compras' | '/obras'
+  to: '/' | '/compras' | '/obras' | '/obras/$id'
+  id: '__root__' | '/' | '/compras' | '/obras' | '/obras/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ComprasRoute: typeof ComprasRoute
-  ObrasRoute: typeof ObrasRoute
+  ObrasRoute: typeof ObrasRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
@@ -82,13 +91,30 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/obras/$id': {
+      id: '/obras/$id'
+      path: '/$id'
+      fullPath: '/obras/$id'
+      preLoaderRoute: typeof ObrasIdRouteImport
+      parentRoute: typeof ObrasRoute
+    }
   }
 }
+
+interface ObrasRouteChildren {
+  ObrasIdRoute: typeof ObrasIdRoute
+}
+
+const ObrasRouteChildren: ObrasRouteChildren = {
+  ObrasIdRoute: ObrasIdRoute,
+}
+
+const ObrasRouteWithChildren = ObrasRoute._addFileChildren(ObrasRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ComprasRoute: ComprasRoute,
-  ObrasRoute: ObrasRoute,
+  ObrasRoute: ObrasRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
