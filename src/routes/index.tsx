@@ -1,7 +1,7 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppShell, StatusBadge } from "@/components/layout/AppShell";
 import { Card } from "@/components/ui/card";
-import { UNIDADES } from "@/data/seazone";
+import { UNIDADES, unidadeSlug } from "@/data/seazone";
 import {
   BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, Cell, PieChart, Pie, Legend,
 } from "recharts";
@@ -107,7 +107,12 @@ function VisaoGeral() {
             const atrasada = u.status === "Atrasada";
             const Icon = atrasada ? AlertCircle : AlertTriangle;
             return (
-              <div key={u.empreendimento + u.unidade} className={`rounded-lg border p-4 bg-background ${atrasada ? "border-status-atrasada/40" : "border-status-atencao/40"}`}>
+              <Link
+                key={u.empreendimento + u.unidade}
+                to="/obras/$id"
+                params={{ id: unidadeSlug(u) }}
+                className={`block rounded-lg border p-4 bg-background hover:shadow-sm hover:border-primary/60 transition ${atrasada ? "border-status-atrasada/40" : "border-status-atencao/40"}`}
+              >
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex items-center gap-2">
                     <Icon className={`h-4 w-4 ${atrasada ? "text-status-atrasada" : "text-status-atencao"}`} />
@@ -125,7 +130,7 @@ function VisaoGeral() {
                 <div className={`mt-2 text-[11px] font-medium uppercase tracking-wide ${atrasada ? "text-status-atrasada" : "text-status-atencao"}`}>
                   {atrasada ? "Obra atrasada" : "Atenção: prazo final"}
                 </div>
-              </div>
+              </Link>
             );
           })}
         </div>
