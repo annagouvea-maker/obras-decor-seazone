@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { Fragment } from "react";
 import { AppShell, StatusBadge, ProgressBar } from "@/components/layout/AppShell";
@@ -7,8 +7,8 @@ import { Input } from "@/components/ui/input";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
-import { UNIDADES, EMPREENDIMENTOS, ADMS, etapaAtualLabel, etapasParaUnidade } from "@/data/seazone";
-import { ChevronDown, ChevronRight, Search } from "lucide-react";
+import { UNIDADES, EMPREENDIMENTOS, ADMS, etapaAtualLabel, etapasParaUnidade, unidadeSlug } from "@/data/seazone";
+import { ChevronDown, ChevronRight, Search, ExternalLink } from "lucide-react";
 
 export const Route = createFileRoute("/obras")({
   head: () => ({
@@ -26,6 +26,7 @@ function ObrasPage() {
   const [admFilter, setAdmFilter] = useState("todos");
   const [search, setSearch] = useState("");
   const [expanded, setExpanded] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   const filtered = useMemo(() => {
     return UNIDADES.filter((u) => {
@@ -94,6 +95,7 @@ function ObrasPage() {
                 <th className="text-left font-medium px-4 py-3">% Concluído</th>
                 <th className="text-left font-medium px-4 py-3">Status</th>
                 <th className="text-left font-medium px-4 py-3">Prazo Contrato</th>
+                <th className="text-right font-medium px-4 py-3">Detalhes</th>
               </tr>
             </thead>
             <tbody>
@@ -104,9 +106,11 @@ function ObrasPage() {
                   <Fragment key={id}>
                     <tr
                       className="border-t cursor-pointer hover:bg-muted/30 transition-colors"
-                      onClick={() => setExpanded(isOpen ? null : id)}
+                      onClick={() => navigate({ to: "/obras/$id", params: { id: unidadeSlug(u) } })}
                     >
-                      <td className="px-4 py-3">{isOpen ? <ChevronDown className="h-4 w-4 text-muted-foreground" /> : <ChevronRight className="h-4 w-4 text-muted-foreground" />}</td>
+                      <td className="px-4 py-3" onClick={(e) => { e.stopPropagation(); setExpanded(isOpen ? null : id); }}>
+                        {isOpen ? <ChevronDown className="h-4 w-4 text-muted-foreground" /> : <ChevronRight className="h-4 w-4 text-muted-foreground" />}
+                      </td>
                       <td className="px-4 py-3 font-medium text-foreground">{u.unidade}</td>
                       <td className="px-4 py-3 text-foreground">{u.empreendimento}</td>
                       <td className="px-4 py-3 text-muted-foreground">{u.investidor}</td>
@@ -116,10 +120,15 @@ function ObrasPage() {
                       <td className="px-4 py-3"><ProgressBar value={u.percentual} /></td>
                       <td className="px-4 py-3"><StatusBadge status={u.status} /></td>
                       <td className="px-4 py-3 text-muted-foreground">{u.prazo}</td>
+                      <td className="px-4 py-3 text-right">
+                        <span className="inline-flex items-center gap-1 text-primary text-xs font-medium">
+                          Ver <ExternalLink className="h-3.5 w-3.5" />
+                        </span>
+                      </td>
                     </tr>
                     {isOpen && (
                       <tr className="bg-muted/20 border-t">
-                        <td colSpan={10} className="px-6 py-5">
+                        <td colSpan={11} className="px-6 py-5">
                           <div className="font-semibold text-sm mb-3 text-foreground">Etapas da obra — {u.empreendimento} {u.unidade}</div>
                           <ol className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
                             {etapasParaUnidade(u.percentual).map((e, i) => (
