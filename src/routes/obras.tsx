@@ -7,8 +7,11 @@ import { Input } from "@/components/ui/input";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
-import { UNIDADES, EMPREENDIMENTOS, ADMS, etapaAtualLabel, etapasParaUnidade, unidadeSlug } from "@/data/seazone";
-import { ChevronDown, ChevronRight, Search, ExternalLink } from "lucide-react";
+import { EMPREENDIMENTOS, ADMS, etapaAtualLabel, etapasParaUnidade, unidadeSlug } from "@/data/seazone";
+import { useSheetData } from "@/hooks/useSheetData";
+import { ChevronDown, ChevronRight, Search, Camera } from "lucide-react";
+
+const DRIVE_FOTOS_URL = "https://drive.google.com/drive/folders/1U0PxtQeuURhOY-aFoD0TZvh8WwSkGs61";
 
 export const Route = createFileRoute("/obras")({
   head: () => ({
@@ -27,9 +30,10 @@ function ObrasPage() {
   const [search, setSearch] = useState("");
   const [expanded, setExpanded] = useState<string | null>(null);
   const navigate = useNavigate();
+  const { unidades } = useSheetData();
 
   const filtered = useMemo(() => {
-    return UNIDADES.filter((u) => {
+    return unidades.filter((u) => {
       if (empFilter !== "todos" && u.empreendimento !== empFilter) return false;
       if (statusFilter !== "todos" && u.status !== statusFilter) return false;
       if (admFilter !== "todos" && u.adm !== admFilter) return false;
@@ -43,10 +47,10 @@ function ObrasPage() {
       }
       return true;
     });
-  }, [empFilter, statusFilter, admFilter, search]);
+  }, [unidades, empFilter, statusFilter, admFilter, search]);
 
   return (
-    <AppShell title="Obras" subtitle={`${filtered.length} de ${UNIDADES.length} unidades`}>
+    <AppShell title="Obras" subtitle={`${filtered.length} de ${unidades.length} unidades`}>
       <Card className="p-4 mb-4">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
           <Select value={empFilter} onValueChange={setEmpFilter}>
@@ -94,8 +98,7 @@ function ObrasPage() {
                 <th className="text-left font-medium px-4 py-3">Etapa Atual</th>
                 <th className="text-left font-medium px-4 py-3">% Concluído</th>
                 <th className="text-left font-medium px-4 py-3">Status</th>
-                <th className="text-left font-medium px-4 py-3">Prazo Contrato</th>
-                <th className="text-right font-medium px-4 py-3">Detalhes</th>
+                <th className="text-right font-medium px-4 py-3">Fotos / Registro</th>
               </tr>
             </thead>
             <tbody>
@@ -119,16 +122,18 @@ function ObrasPage() {
                       <td className="px-4 py-3 text-foreground text-xs">{etapaAtualLabel(u.percentual)}</td>
                       <td className="px-4 py-3"><ProgressBar value={u.percentual} /></td>
                       <td className="px-4 py-3"><StatusBadge status={u.status} /></td>
-                      <td className="px-4 py-3 text-muted-foreground">{u.prazo}</td>
-                      <td className="px-4 py-3 text-right">
-                        <span className="inline-flex items-center gap-1 text-primary text-xs font-medium">
-                          Ver <ExternalLink className="h-3.5 w-3.5" />
+                      <td
+                        className="px-4 py-3 text-right"
+                        onClick={(e) => { e.stopPropagation(); window.open(DRIVE_FOTOS_URL, "_blank"); }}
+                      >
+                        <span className="inline-flex items-center gap-1 text-primary text-xs font-medium cursor-pointer hover:underline">
+                          Fotos <Camera className="h-3.5 w-3.5" />
                         </span>
                       </td>
                     </tr>
                     {isOpen && (
                       <tr className="bg-muted/20 border-t">
-                        <td colSpan={11} className="px-6 py-5">
+                        <td colSpan={10} className="px-6 py-5">
                           <div className="font-semibold text-sm mb-3 text-foreground">Etapas da obra — {u.empreendimento} {u.unidade}</div>
                           <ol className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
                             {etapasParaUnidade(u.percentual).map((e, i) => (

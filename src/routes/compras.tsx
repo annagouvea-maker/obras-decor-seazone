@@ -3,7 +3,8 @@ import { useMemo, useState } from "react";
 import { AppShell, StatusBadge } from "@/components/layout/AppShell";
 import { Card } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { COMPRAS, EMPREENDIMENTOS, UNIDADES, formatBRL } from "@/data/seazone";
+import { EMPREENDIMENTOS, UNIDADES, formatBRL } from "@/data/seazone";
+import { useSheetData } from "@/hooks/useSheetData";
 
 export const Route = createFileRoute("/compras")({
   head: () => ({
@@ -15,33 +16,37 @@ export const Route = createFileRoute("/compras")({
   component: ComprasPage,
 });
 
-const KPIS = [
-  { label: "Total de Itens", value: "45" },
-  { label: "Valor Total Investido", value: "R$ 220.000,00" },
-  { label: "Aguardando Entrega", value: "12 itens" },
-  { label: "Entregues", value: "28 itens" },
-];
-
 function ComprasPage() {
   const [emp, setEmp] = useState("todos");
   const [un, setUn] = useState("todos");
   const [st, setSt] = useState("todos");
+  const { compras } = useSheetData();
 
   const filtered = useMemo(() => {
-    return COMPRAS.filter((c) => {
+    return compras.filter((c) => {
       if (emp !== "todos" && c.empreendimento !== emp && c.empreendimento !== "Todos") return false;
       if (un !== "todos" && !c.unidades.includes(un)) return false;
       if (st !== "todos" && c.status !== st) return false;
       return true;
     });
-  }, [emp, un, st]);
+  }, [compras, emp, un, st]);
+
+  const kpis = useMemo(() => [
+    { label: "Total de Itens", value: String(compras.length) },
+    { label: "Valor Total Investido", value: formatBRL(compras.reduce((s, c) => s + c.valorTotal, 0)) },
+    {
+      label: "Aguardando Entrega",
+      value: `${compras.filter((c) => c.status === "Previsto" || c.status === "Pendente").length} itens`,
+    },
+    { label: "Entregues", value: `${compras.filter((c) => c.status === "Entregue").length} itens` },
+  ], [compras]);
 
   const unidadesUnicas = Array.from(new Set(UNIDADES.map((u) => u.unidade))).sort();
 
   return (
     <AppShell title="Compras" subtitle="Pedidos, fornecedores e prazos de entrega">
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        {KPIS.map((k) => (
+        {kpis.map((k) => (
           <Card key={k.label} className="p-4">
             <div className="text-xs text-muted-foreground font-medium">{k.label}</div>
             <div className="text-2xl font-semibold mt-2 text-foreground tabular-nums">{k.value}</div>
@@ -85,13 +90,11 @@ function ComprasPage() {
               <tr>
                 <th className="text-left font-medium px-4 py-3">Cód</th>
                 <th className="text-left font-medium px-4 py-3">Produto</th>
-                <th className="text-left font-medium px-4 py-3">Especificações</th>
                 <th className="text-left font-medium px-4 py-3">Unidades</th>
                 <th className="text-right font-medium px-4 py-3">Qtde</th>
                 <th className="text-right font-medium px-4 py-3">Valor Total</th>
                 <th className="text-left font-medium px-4 py-3">Prazo Entrega</th>
                 <th className="text-left font-medium px-4 py-3">Status</th>
-                <th className="text-left font-medium px-4 py-3">Fornecedor</th>
               </tr>
             </thead>
             <tbody>
@@ -99,15 +102,20 @@ function ComprasPage() {
                 <tr key={c.codigo} className="border-t hover:bg-muted/30 transition-colors">
                   <td className="px-4 py-3 font-mono text-xs text-muted-foreground">{c.codigo}</td>
                   <td className="px-4 py-3 font-medium text-foreground">{c.produto}</td>
-                  <td className="px-4 py-3 text-muted-foreground max-w-[260px]">{c.especificacoes}</td>
                   <td className="px-4 py-3 text-muted-foreground max-w-[200px] truncate" title={c.unidades}>{c.unidades}</td>
                   <td className="px-4 py-3 text-right tabular-nums text-foreground">{c.qtde}</td>
                   <td className="px-4 py-3 text-right tabular-nums font-medium text-foreground">{formatBRL(c.valorTotal)}</td>
                   <td className="px-4 py-3 text-muted-foreground">{c.prazoEntrega}</td>
                   <td className="px-4 py-3"><StatusBadge status={c.status} /></td>
-                  <td className="px-4 py-3 text-muted-foreground">{c.fornecedor}</td>
                 </tr>
               ))}
+              {filtered.length === 0 && (
+                <tr>
+                  <td colSpan={7} className="px-4 py-8 text-center text-sm text-muted-foreground">
+                    Nenhuma compra encontrada com os filtros selecionados.
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>

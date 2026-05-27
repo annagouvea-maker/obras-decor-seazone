@@ -39,18 +39,11 @@ export function StatusBadge({ status }: { status: string }) {
   );
 }
 
-export function ProgressBar({ value, tone = "amber" }: { value: number; tone?: "amber" | "green" | "red" | "blue" }) {
-  const colors: Record<string, string> = {
-    amber: "bg-status-atencao",
-    green: "bg-status-em-dia",
-    red: "bg-status-atrasada",
-    blue: "bg-status-andamento",
-  };
-  const color = value >= 100 ? colors.green : value < 35 ? colors.red : colors[tone];
+export function ProgressBar({ value }: { value: number }) {
   return (
     <div className="flex items-center gap-2 min-w-[140px]">
       <div className="h-2 flex-1 rounded-full bg-muted overflow-hidden">
-        <div className={`h-full rounded-full ${color}`} style={{ width: `${value}%` }} />
+        <div className="h-full rounded-full bg-slate-400" style={{ width: `${value}%` }} />
       </div>
       <span className="text-xs font-medium text-foreground tabular-nums w-9 text-right">{value}%</span>
     </div>

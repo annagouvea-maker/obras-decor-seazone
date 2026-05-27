@@ -13,7 +13,7 @@ import {
   comprasDaUnidade,
   formatBRL,
 } from "@/data/seazone";
-import { ArrowLeft, Check, Package, Palette, ListChecks, Image as ImageIcon, ShoppingCart } from "lucide-react";
+import { ArrowLeft, Check, Package, Palette, ListChecks, Image as ImageIcon, ShoppingCart, FolderOpen } from "lucide-react";
 
 export const Route = createFileRoute("/obras/$id")({
   head: ({ params }) => {
@@ -185,6 +185,14 @@ function UnidadeDetalhe() {
           <Card className="p-5">
             <h2 className="font-semibold text-foreground mb-1">Fotos da obra</h2>
             <p className="text-xs text-muted-foreground mb-4">Registro fotográfico das últimas vistorias</p>
+            <a
+              href="https://drive.google.com/drive/folders/1U0PxtQeuURhOY-aFoD0TZvh8WwSkGs61"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 mb-5 rounded-md border border-primary/40 bg-primary/5 px-4 py-2 text-sm font-medium text-primary hover:bg-primary/10 transition"
+            >
+              <FolderOpen className="h-4 w-4" /> Ver todas as fotos no Google Drive
+            </a>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {FOTOS_OBRA.map((f) => (
                 <figure key={f.url} className="rounded-md overflow-hidden border bg-background">
@@ -207,8 +215,6 @@ function UnidadeDetalhe() {
                 <thead className="bg-muted/50 text-muted-foreground text-xs uppercase tracking-wide">
                   <tr>
                     <th className="text-left font-medium px-4 py-3">Produto</th>
-                    <th className="text-left font-medium px-4 py-3">Especificações</th>
-                    <th className="text-left font-medium px-4 py-3">Fornecedor</th>
                     <th className="text-left font-medium px-4 py-3">Prazo</th>
                     <th className="text-left font-medium px-4 py-3">Status</th>
                   </tr>
@@ -217,14 +223,12 @@ function UnidadeDetalhe() {
                   {compras.map((c) => (
                     <tr key={c.codigo} className="border-t hover:bg-muted/30">
                       <td className="px-4 py-3 font-medium text-foreground">{c.produto}</td>
-                      <td className="px-4 py-3 text-muted-foreground max-w-[260px]">{c.especificacoes}</td>
-                      <td className="px-4 py-3 text-muted-foreground">{c.fornecedor}</td>
                       <td className="px-4 py-3 text-muted-foreground">{c.prazoEntrega}</td>
                       <td className="px-4 py-3"><StatusBadge status={c.status} /></td>
                     </tr>
                   ))}
                   {compras.length === 0 && (
-                    <tr><td colSpan={5} className="px-4 py-8 text-center text-sm text-muted-foreground">Nenhuma compra vinculada a esta unidade.</td></tr>
+                    <tr><td colSpan={3} className="px-4 py-8 text-center text-sm text-muted-foreground">Nenhuma compra vinculada a esta unidade.</td></tr>
                   )}
                 </tbody>
               </table>

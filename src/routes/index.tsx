@@ -1,7 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useMemo } from "react";
 import { AppShell, StatusBadge } from "@/components/layout/AppShell";
 import { Card } from "@/components/ui/card";
-import { UNIDADES, unidadeSlug } from "@/data/seazone";
+import { EMPREENDIMENTOS, unidadeSlug } from "@/data/seazone";
+import { useSheetData } from "@/hooks/useSheetData";
 import {
   BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, Cell, PieChart, Pie, Legend,
 } from "recharts";
@@ -17,30 +19,6 @@ export const Route = createFileRoute("/")({
   component: VisaoGeral,
 });
 
-const KPIS = [
-  { label: "Unidades em Obra", value: "20", tone: "default" },
-  { label: "Concluídas", value: "2", tone: "default" },
-  { label: "Avanço Médio", value: "73%", tone: "default" },
-  { label: "Atenção: Prazo", value: "8", tone: "atencao" },
-  { label: "Obras Atrasadas", value: "1", tone: "atrasada" },
-  { label: "Em Dia", value: "11", tone: "em-dia" },
-] as const;
-
-const progressoEmp = [
-  { nome: "Urubici Spot", valor: 74 },
-  { nome: "Penha Spot", valor: 64 },
-  { nome: "House Espatódeas", valor: 100 },
-  { nome: "House Graça", valor: 68 },
-  { nome: "MOV Perdizes", valor: 31 },
-];
-
-const statusData = [
-  { name: "Em Dia", value: 11, color: "var(--status-em-dia)" },
-  { name: "Atenção Prazo", value: 8, color: "var(--status-atencao)" },
-  { name: "Atrasada", value: 1, color: "var(--status-atrasada)" },
-  { name: "Concluída", value: 2, color: "var(--status-concluida)" },
-];
-
 function toneClass(tone: string) {
   switch (tone) {
     case "atencao": return "text-status-atencao";
@@ -51,14 +29,58 @@ function toneClass(tone: string) {
 }
 
 function VisaoGeral() {
-  const alertas = UNIDADES.filter(
-    (u) => u.status === "Atenção Prazo" || u.status === "Atrasada",
+  const { unidades } = useSheetData();
+
+  const kpis = useMemo(() => {
+    const total = unidades.length;
+    const concluidas = unidades.filter((u) => u.status === "Concluída").length;
+    const emObra = total - concluidas;
+    const avgPct = total > 0 ? Math.round(unidades.reduce((s, u) => s + u.percentual, 0) / total) : 0;
+    const atencao = unidades.filter((u) => u.status === "Atenção Prazo").length;
+    const atrasada = unidades.filter((u) => u.status === "Atrasada").length;
+    const emDia = unidades.filter((u) => u.status === "Em Dia").length;
+    return [
+      { label: "Unidades em Obra", value: String(emObra), tone: "default" },
+      { label: "Concluídas", value: String(concluidas), tone: "default" },
+      { label: "Avanço Médio", value: `${avgPct}%`, tone: "default" },
+      { label: "Atenção: Prazo", value: String(atencao), tone: "atencao" },
+      { label: "Obras Atrasadas", value: String(atrasada), tone: "atrasada" },
+      { label: "Em Dia", value: String(emDia), tone: "em-dia" },
+    ] as { label: string; value: string; tone: string }[];
+  }, [unidades]);
+
+  const progressoEmp = useMemo(
+    () =>
+      EMPREENDIMENTOS.map((nome) => {
+        const units = unidades.filter((u) => u.empreendimento === nome);
+        const avg =
+          units.length > 0
+            ? Math.round(units.reduce((s, u) => s + u.percentual, 0) / units.length)
+            : 0;
+        return { nome, valor: avg };
+      }),
+    [unidades],
+  );
+
+  const statusData = useMemo(
+    () => [
+      { name: "Em Dia", value: unidades.filter((u) => u.status === "Em Dia").length, color: "var(--status-em-dia)" },
+      { name: "Atenção Prazo", value: unidades.filter((u) => u.status === "Atenção Prazo").length, color: "var(--status-atencao)" },
+      { name: "Atrasada", value: unidades.filter((u) => u.status === "Atrasada").length, color: "var(--status-atrasada)" },
+      { name: "Concluída", value: unidades.filter((u) => u.status === "Concluída").length, color: "var(--status-concluida)" },
+    ],
+    [unidades],
+  );
+
+  const alertas = useMemo(
+    () => unidades.filter((u) => u.status === "Atenção Prazo" || u.status === "Atrasada"),
+    [unidades],
   );
 
   return (
     <AppShell title="Visão Geral" subtitle="Acompanhamento consolidado dos empreendimentos">
       <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4 mb-6">
-        {KPIS.map((k) => (
+        {kpis.map((k) => (
           <Card key={k.label} className="p-4">
             <div className="text-xs text-muted-foreground font-medium">{k.label}</div>
             <div className={`text-2xl font-semibold mt-2 tabular-nums ${toneClass(k.tone)}`}>{k.value}</div>
@@ -76,7 +98,7 @@ function VisaoGeral() {
                 <XAxis type="number" domain={[0, 100]} tickFormatter={(v) => `${v}%`} fontSize={11} stroke="var(--muted-foreground)" />
                 <YAxis type="category" dataKey="nome" width={120} fontSize={11} stroke="var(--muted-foreground)" />
                 <Tooltip formatter={(v) => `${v}%`} cursor={{ fill: "var(--muted)" }} contentStyle={{ borderRadius: 8, border: "1px solid var(--border)", fontSize: 12 }} />
-                <Bar dataKey="valor" fill="var(--status-atencao)" radius={[0, 4, 4, 0]} />
+                <Bar dataKey="valor" fill="var(--primary)" radius={[0, 4, 4, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
