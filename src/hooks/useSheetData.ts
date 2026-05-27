@@ -31,9 +31,7 @@ const COMPRAS_TABS: { gid: string; empreendimento: string }[] = [
   { gid: "271446938",  empreendimento: "Urubici Spot" },
   { gid: "1620193194", empreendimento: "Penha Spot" },
   { gid: "2075898158", empreendimento: "MOV Perdizes" },
-  // Adicione as outras abas abaixo quando os GIDs forem identificados:
-  // { gid: "XXXXXXXXX", empreendimento: "House Espatódeas" },
-  // { gid: "XXXXXXXXX", empreendimento: "House Graça" },
+  // House Espatódeas e House Graça: sem aba de compras no dashboard (intencional)
 ];
 
 const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutos
