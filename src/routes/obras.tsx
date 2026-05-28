@@ -31,7 +31,7 @@ export const Route = createFileRoute("/obras")({
 function EtapasStepper({ percentual }: { percentual: number }) {
   const etapas = etapasParaUnidade(percentual);
   return (
-    <div className="overflow-x-auto pb-2">
+    <div className="overflow-x-auto overflow-y-hidden pb-3 -mx-1 px-1">
       <div className="flex items-start min-w-max">
         {etapas.map((e, i) => {
           const isDone   = e.status === "Finalizado";
@@ -41,7 +41,7 @@ function EtapasStepper({ percentual }: { percentual: number }) {
           return (
             <div key={i} className="flex items-start">
               {/* Nó + label */}
-              <div className="flex flex-col items-center w-[72px]">
+              <div className="flex flex-col items-center w-[88px] shrink-0">
                 {/* Círculo */}
                 <div
                   className={`h-7 w-7 rounded-full flex items-center justify-center text-[10px] font-bold border-2 transition-all ${
@@ -56,7 +56,7 @@ function EtapasStepper({ percentual }: { percentual: number }) {
                 </div>
                 {/* Label */}
                 <div
-                  className={`mt-2 text-[9px] text-center leading-tight px-0.5 w-full ${
+                  className={`mt-2 text-[10px] text-center leading-tight px-1 w-full break-words whitespace-normal hyphens-auto ${
                     isActive
                       ? "text-[#1a1f3c] font-semibold"
                       : isDone
@@ -276,7 +276,7 @@ function ObrasPage() {
                     {isOpen && (
                       <tr className="bg-[#f8f9fb] border-b border-gray-100">
                         <td colSpan={9} className="px-8 py-6">
-                          <div className="w-full overflow-x-auto whitespace-nowrap">
+                          <div className="w-full">
                           <div className="flex items-center justify-between mb-4">
                             <div>
                               <span className="text-xs font-semibold text-gray-400 uppercase tracking-wide">
