@@ -1,6 +1,27 @@
 import { ReactNode } from "react";
 import { Sidebar } from "./Sidebar";
 
+function SeazoneLogoMark({ size = 28 }: { size?: number }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 100 100"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="Seazone"
+    >
+      <rect x="62" y="3" width="14" height="30" rx="7" fill="#fc605b" />
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M50 14 C53 14 84 39 88 48 C92 57 85 63 78 57 L78 84 Q78 94 66 94 L34 94 Q22 94 22 82 L22 57 C15 63 8 57 12 48 C16 39 47 14 50 14 Z M32 67 a18 18 0 1 0 36 0 a18 18 0 1 0 -36 0"
+        fill="#fc605b"
+      />
+    </svg>
+  );
+}
+
 export function AppShell({
   title,
   subtitle,
@@ -14,11 +35,16 @@ export function AppShell({
     <div className="min-h-screen flex w-full bg-[#F1F3F4]">
       <Sidebar />
       <main className="flex-1 min-w-0 flex flex-col">
-        <header className="bg-[#F1F3F4] border-b border-black/5 px-8 py-5">
-          <h1 className="text-xl font-medium tracking-tight text-[#171E37]">{title}</h1>
-          {subtitle && (
-            <p className="text-sm text-muted-foreground mt-0.5">{subtitle}</p>
-          )}
+        <header className="bg-[#F1F3F4] border-b border-black/5 px-6 lg:px-8 py-5 flex items-center gap-3">
+          <div className="lg:hidden shrink-0">
+            <SeazoneLogoMark size={32} />
+          </div>
+          <div className="min-w-0">
+            <h1 className="text-xl font-medium tracking-tight text-[#171E37] truncate">{title}</h1>
+            {subtitle && (
+              <p className="text-sm text-muted-foreground mt-0.5 truncate">{subtitle}</p>
+            )}
+          </div>
         </header>
         <div className="flex-1 p-8">{children}</div>
       </main>

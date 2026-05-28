@@ -83,17 +83,10 @@ export function Sidebar() {
 
               <Link
                 to={it.to}
-                className="flex items-center gap-3 text-[13px] transition-all duration-150 outline-none"
+                className={`flex items-center gap-3 text-[13px] transition-all duration-150 outline-none ${active ? "sb-active" : ""}`}
                 style={
                   active
-                    ? {
-                        background:   PAGE_BG,
-                        color:        SIDEBAR_BG,
-                        borderRadius: "1rem 0 0 1rem",   /* rounded left, flat right */
-                        marginLeft:   "1rem",
-                        padding:      "0.75rem 1.5rem",
-                        fontWeight:   500,
-                      }
+                    ? undefined
                     : {
                         color:        "rgba(255,255,255,0.45)",
                         borderRadius: "0.75rem",

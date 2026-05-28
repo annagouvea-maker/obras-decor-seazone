@@ -24,7 +24,7 @@ const EMP_COLORS: Record<string, string> = {
   "Urubici Spot":     "#1e9bc0",  // cerulean
   "Penha Spot":       "#c9a020",  // gold
   "MOV Perdizes":     "#1aab8b",  // teal
-  "House Espatódeas": "#4A6FA5",  // azul médio
+  "House Espatódeas": "#171E37",  // navy oficial Seazone
   "House Graça":      "#7A9E8C",  // verde-acinzentado
 };
 function empColor(nome: string) {
@@ -71,7 +71,7 @@ function VisaoGeral() {
         { name: "Em Dia",        value: stats.emDia,      color: "#1CA095" }, // verde água
         { name: "Atenção Prazo", value: stats.atencao,    color: "#DCAB1E" }, // mostarda
         { name: "Atrasada",      value: stats.atrasada,   color: "#EF4444" }, // vermelho alerta
-        { name: "Concluída",     value: stats.concluidas, color: "#1A9CB9" }, // azul turquesa
+        { name: "Concluída",     value: stats.concluidas, color: "#94a3b8" }, // mesmo cinza do KPI "Concluídas"
       ].filter((d) => d.value > 0),
     [stats],
   );
