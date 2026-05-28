@@ -8,15 +8,31 @@ const GOLD       = "#c9a020";
 
 function SeazoneLogo() {
   return (
-    <svg width="48" height="48" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg width="52" height="52" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+      {/* Chaminé — rect separado para ficar ACIMA da casa */}
+      <rect x="63" y="4" width="13" height="28" rx="6" fill="#FC605B" />
+      {/* Casa com buraco circular — evenodd cria o recorte */}
       <path
         fillRule="evenodd"
         clipRule="evenodd"
-        d="M50 8 L87 47 L74 47 L74 91 L26 91 L26 47 L13 47 Z
-           M50 53 A19 19 0 1 0 50.001 53 Z"
-        fill="#fc605b"
+        d="
+          M50 12
+          C52 12 83 37 87 45
+          C91 52 85 58 79 53
+          L79 83
+          Q79 91 69 91
+          L31 91
+          Q21 91 21 81
+          L21 53
+          C15 58 9 52 13 45
+          C17 37 48 12 50 12
+          Z
+          M31 66
+          a19 19 0 1 0 38 0
+          a19 19 0 1 0 -38 0
+        "
+        fill="#FC605B"
       />
-      <rect x="60" y="9" width="11" height="22" rx="3" fill="#fc605b" />
     </svg>
   );
 }
