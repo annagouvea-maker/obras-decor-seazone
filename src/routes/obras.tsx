@@ -239,10 +239,10 @@ function ObrasPage() {
                       <td className="px-4 py-4">
                         <span className={`inline-flex rounded-full px-2.5 py-1 text-[11px] font-semibold ${
                           u.pacote === "Premium"
-                            ? "bg-[#1a1f3c]/10 text-[#1a1f3c]"
+                            ? "bg-[#c9a020]/10 text-[#c9a020]"
                             : u.pacote === "Plus"
-                            ? "bg-blue-50 text-blue-700"
-                            : "bg-gray-100 text-gray-600"
+                            ? "bg-[#1e9bc0]/10 text-[#1e9bc0]"
+                            : "bg-[#4A6FA5]/10 text-[#4A6FA5]"
                         }`}>
                           {u.pacote}
                         </span>
@@ -265,7 +265,7 @@ function ObrasPage() {
                         className="px-4 py-4 text-right"
                         onClick={(e) => { e.stopPropagation(); window.open(u.driveUrl || DRIVE_FOTOS_URL, "_blank"); }}
                       >
-                        <button className="inline-flex items-center gap-1.5 text-[#fc605b] text-xs font-semibold hover:text-[#e5544f] transition-colors">
+                        <button className="inline-flex items-center gap-1.5 text-[#1e9bc0] text-xs font-semibold hover:text-[#1a85a6] transition-colors">
                           <Camera className="h-3.5 w-3.5" />
                           Fotos
                         </button>

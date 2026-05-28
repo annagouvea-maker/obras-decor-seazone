@@ -84,7 +84,7 @@ function ComprasPage() {
           <div className="text-[11px] font-semibold text-gray-400 uppercase tracking-wide mb-3">
             Aguardando Entrega
           </div>
-          <div className="text-2xl font-semibold tabular-nums text-amber-600">
+          <div className="text-2xl font-semibold tabular-nums text-[#c9a020]">
             {totalAguardando} <span className="text-sm font-normal text-gray-400">itens</span>
           </div>
         </div>
@@ -92,7 +92,7 @@ function ComprasPage() {
           <div className="text-[11px] font-semibold text-gray-400 uppercase tracking-wide mb-3">
             Entregues
           </div>
-          <div className="text-2xl font-semibold tabular-nums text-emerald-600">
+          <div className="text-2xl font-semibold tabular-nums text-[#1aab8b]">
             {totalEntregue} <span className="text-sm font-normal text-gray-400">itens</span>
           </div>
         </div>
@@ -143,11 +143,11 @@ function ComprasPage() {
         <div className="overflow-x-auto">
           <table className="w-full text-sm table-fixed">
             <colgroup>
-              <col className="w-36" />   {/* Empreendimento */}
-              <col className="w-28" />   {/* Categoria */}
-              <col />                    {/* Produto — espaço restante */}
-              <col className="w-14" />   {/* Qtde */}
-              <col className="w-24" />   {/* Unidades */}
+              <col className="w-32" />   {/* Empreendimento */}
+              <col className="w-24" />   {/* Categoria */}
+              <col className="w-44" />   {/* Produto */}
+              <col className="w-12" />   {/* Qtde */}
+              <col className="w-20" />   {/* Unidades */}
               <col className="w-28" />   {/* Valor Total */}
               <col className="w-28" />   {/* Status */}
             </colgroup>
