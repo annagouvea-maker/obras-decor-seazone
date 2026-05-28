@@ -239,10 +239,10 @@ function ObrasPage() {
                       <td className="px-4 py-4">
                         <span className={`inline-flex rounded-full px-2.5 py-1 text-[11px] font-semibold ${
                           u.pacote === "Premium"
-                            ? "bg-[#c9a020]/10 text-[#c9a020]"
+                            ? "bg-[#171E37]/10 text-[#171E37]"
                             : u.pacote === "Plus"
-                            ? "bg-[#1e9bc0]/10 text-[#1e9bc0]"
-                            : "bg-[#4A6FA5]/10 text-[#4A6FA5]"
+                            ? "bg-[#1A9CB9]/10 text-[#1A9CB9]"
+                            : "bg-[#1CA095]/10 text-[#1CA095]"
                         }`}>
                           {u.pacote}
                         </span>
@@ -265,7 +265,7 @@ function ObrasPage() {
                         className="px-4 py-4 text-right"
                         onClick={(e) => { e.stopPropagation(); window.open(u.driveUrl || DRIVE_FOTOS_URL, "_blank"); }}
                       >
-                        <button className="inline-flex items-center gap-1.5 text-[#1e9bc0] text-xs font-semibold hover:text-[#1a85a6] transition-colors">
+                        <button className="inline-flex items-center gap-1.5 text-[#1CA095] text-xs font-semibold hover:text-[#178476] transition-colors">
                           <Camera className="h-3.5 w-3.5" />
                           Fotos
                         </button>
@@ -276,6 +276,7 @@ function ObrasPage() {
                     {isOpen && (
                       <tr className="bg-[#f8f9fb] border-b border-gray-100">
                         <td colSpan={9} className="px-8 py-6">
+                          <div className="w-full overflow-x-auto whitespace-nowrap">
                           <div className="flex items-center justify-between mb-4">
                             <div>
                               <span className="text-xs font-semibold text-gray-400 uppercase tracking-wide">
@@ -298,6 +299,7 @@ function ObrasPage() {
                             </div>
                           </div>
                           <EtapasStepper percentual={u.percentual} />
+                          </div>
                         </td>
                       </tr>
                     )}
