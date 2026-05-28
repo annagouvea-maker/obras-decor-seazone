@@ -168,3 +168,37 @@
     color: var(--color-foreground);
   }
 }
+
+/* ── Sidebar active item — concave (inverted radius) effect ─────────── */
+/* The active link merges into the page background (#F1F3F4),
+   and the two pseudo-elements carve concave curves above & below
+   so the sidebar (#171E37) appears to wrap smoothly around the pill. */
+.sb-active {
+  position: relative;
+  background: #F1F3F4;
+  color: #171E37;
+  border-radius: 1rem 0 0 1rem;
+  margin-left: 1rem;
+  padding: 0.75rem 1.5rem;
+  font-weight: 500;
+}
+.sb-active::before,
+.sb-active::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  width: 18px;
+  height: 18px;
+  background: #F1F3F4;
+  pointer-events: none;
+}
+.sb-active::before {
+  top: -18px;
+  -webkit-mask-image: radial-gradient(circle 18px at 0 0, transparent 18px, #000 19px);
+          mask-image: radial-gradient(circle 18px at 0 0, transparent 18px, #000 19px);
+}
+.sb-active::after {
+  bottom: -18px;
+  -webkit-mask-image: radial-gradient(circle 18px at 0 100%, transparent 18px, #000 19px);
+          mask-image: radial-gradient(circle 18px at 0 100%, transparent 18px, #000 19px);
+}
