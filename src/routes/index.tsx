@@ -28,7 +28,7 @@ const EMP_COLORS: Record<string, string> = {
   "House Graça":      "#A55EEA",
 };
 function empColor(nome: string) {
-  return EMP_COLORS[nome] ?? "#00153e";
+  return EMP_COLORS[nome] ?? "#1a1f3c";
 }
 
 function VisaoGeral() {
@@ -46,7 +46,7 @@ function VisaoGeral() {
   }, [unidades]);
 
   const kpiCards = [
-    { label: "Unidades em Obra", value: stats.emObra,    dotColor: "bg-[#00153e]",    textColor: "#00153e", filter: "todos"        },
+    { label: "Unidades em Obra", value: stats.emObra,    dotColor: "bg-[#1a1f3c]",    textColor: "#1a1f3c", filter: "todos"        },
     { label: "Concluídas",       value: stats.concluidas, dotColor: "bg-slate-400",   textColor: "#6B7280", filter: "Concluída"    },
     { label: "Em Dia",           value: stats.emDia,      dotColor: "bg-emerald-500", textColor: "#059669", filter: "Em Dia"       },
     { label: "Atenção Prazo",    value: stats.atencao,    dotColor: "bg-amber-400",   textColor: "#D97706", filter: "Atenção Prazo"},
@@ -98,7 +98,7 @@ function VisaoGeral() {
               </span>
               <span className={`h-2 w-2 rounded-full shrink-0 ${k.dotColor}`} />
             </div>
-            <div className="text-3xl font-bold tabular-nums" style={{ color: k.textColor }}>
+            <div className="text-3xl font-semibold tabular-nums" style={{ color: k.textColor }}>
               {k.value}
             </div>
             <div className="mt-2 text-[11px] text-gray-300 group-hover:text-gray-400 transition-colors">
@@ -114,8 +114,8 @@ function VisaoGeral() {
         {/* Barras finas — progresso por empreendimento */}
         <div className="lg:col-span-3 bg-white rounded-2xl p-6 shadow-sm border border-black/5">
           <div className="flex items-center gap-2 mb-1">
-            <TrendingUp className="h-4 w-4 text-[#00153e]" />
-            <h2 className="font-semibold text-[#00153e] text-sm">Progresso por Empreendimento</h2>
+            <TrendingUp className="h-4 w-4 text-[#1a1f3c]" />
+            <h2 className="font-semibold text-[#1a1f3c] text-sm">Progresso por Empreendimento</h2>
           </div>
           <p className="text-xs text-gray-400 mb-5">Percentual médio de execução</p>
           <div className="h-52">
@@ -175,7 +175,7 @@ function VisaoGeral() {
 
         {/* Donut — status */}
         <div className="lg:col-span-2 bg-white rounded-2xl p-6 shadow-sm border border-black/5 flex flex-col">
-          <h2 className="font-semibold text-[#00153e] text-sm mb-1">Status das Obras</h2>
+          <h2 className="font-semibold text-[#1a1f3c] text-sm mb-1">Status das Obras</h2>
           <p className="text-xs text-gray-400 mb-2">Distribuição por situação</p>
           <div className="flex-1 min-h-0">
             <ResponsiveContainer width="100%" height={220}>
@@ -214,7 +214,7 @@ function VisaoGeral() {
       {/* ── Alertas ───────────────────────────────────────────────── */}
       {alertas.length > 0 && (
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-black/5">
-          <h2 className="font-semibold text-[#00153e] text-sm mb-1">Obras que precisam de atenção</h2>
+          <h2 className="font-semibold text-[#1a1f3c] text-sm mb-1">Obras que precisam de atenção</h2>
           <p className="text-xs text-gray-400 mb-5">
             {alertas.length} unidade{alertas.length !== 1 ? "s" : ""} requerem acompanhamento
           </p>
@@ -233,7 +233,7 @@ function VisaoGeral() {
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex items-center gap-2">
                       <Icon className="h-4 w-4 shrink-0" style={{ color: accentColor }} />
-                      <div className="font-semibold text-sm text-[#00153e]">
+                      <div className="font-semibold text-sm text-[#1a1f3c]">
                         {u.empreendimento}
                         <span className="font-normal text-gray-400 ml-1 text-xs">{u.unidade}</span>
                       </div>
@@ -242,7 +242,7 @@ function VisaoGeral() {
                   </div>
                   <div className="mt-3 flex items-center justify-between text-xs">
                     <span className="text-gray-400">ADM: <span className="text-gray-700 font-medium">{u.adm}</span></span>
-                    <span className="font-bold tabular-nums" style={{ color: accentColor }}>{u.percentual}%</span>
+                    <span className="font-semibold tabular-nums" style={{ color: accentColor }}>{u.percentual}%</span>
                   </div>
                   <div className="mt-2 h-1 rounded-full bg-gray-100 overflow-hidden">
                     <div className="h-full rounded-full" style={{ width: `${u.percentual}%`, backgroundColor: accentColor }} />

@@ -40,7 +40,7 @@ function AdmPage() {
       subtitle="Registro fotográfico semanal das unidades em obra"
     >
       {/* Instrução */}
-      <div className="bg-[#00153e] rounded-2xl p-6 mb-6 text-white">
+      <div className="bg-[#1a1f3c] rounded-2xl p-6 mb-6 text-white">
         <div className="flex items-start gap-4">
           <div className="h-10 w-10 rounded-xl bg-white/10 flex items-center justify-center shrink-0">
             <Camera className="h-5 w-5 text-[#fc605b]" />
@@ -83,7 +83,7 @@ function AdmPage() {
               {/* Cabeçalho */}
               <div className="flex items-start justify-between gap-2">
                 <div>
-                  <div className="font-bold text-[#00153e] text-base leading-tight">
+                  <div className="font-bold text-[#1a1f3c] text-base leading-tight">
                     {u.unidade}
                   </div>
                   <div className="text-xs text-gray-400 mt-0.5">{u.empreendimento}</div>
@@ -96,7 +96,7 @@ function AdmPage() {
               {/* Barra de progresso */}
               <div className="h-1 rounded-full bg-gray-100 overflow-hidden">
                 <div
-                  className="h-full rounded-full bg-[#00153e]/40"
+                  className="h-full rounded-full bg-[#1a1f3c]/40"
                   style={{ width: `${u.percentual}%` }}
                 />
               </div>
@@ -111,7 +111,7 @@ function AdmPage() {
                 href={driveUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="mt-auto flex items-center justify-center gap-2 rounded-xl bg-[#fc605b] text-white text-sm font-semibold py-2.5 hover:bg-[#e5544f] transition-colors"
+                className="mt-auto flex items-center justify-center gap-2 rounded-xl bg-[#1aab8b] text-white text-sm font-semibold py-2.5 hover:bg-[#158f76] transition-colors"
               >
                 <Upload className="h-4 w-4" />
                 Abrir pasta

@@ -48,7 +48,7 @@ function EtapasStepper({ percentual }: { percentual: number }) {
                     isDone
                       ? "bg-emerald-500 border-emerald-500 text-white"
                       : isActive
-                      ? "bg-[#00153e] border-[#00153e] text-white ring-4 ring-[#00153e]/15"
+                      ? "bg-[#1a1f3c] border-[#1a1f3c] text-white ring-4 ring-[#1a1f3c]/15"
                       : "bg-white border-gray-200 text-gray-400"
                   }`}
                 >
@@ -58,7 +58,7 @@ function EtapasStepper({ percentual }: { percentual: number }) {
                 <div
                   className={`mt-2 text-[9px] text-center leading-tight px-0.5 w-full ${
                     isActive
-                      ? "text-[#00153e] font-semibold"
+                      ? "text-[#1a1f3c] font-semibold"
                       : isDone
                       ? "text-emerald-600"
                       : "text-gray-400"
@@ -226,7 +226,7 @@ function ObrasPage() {
 
                       {/* Unidade + Empreendimento */}
                       <td className="px-4 py-4">
-                        <div className="font-semibold text-[#00153e]">{u.unidade}</div>
+                        <div className="font-semibold text-[#1a1f3c]">{u.unidade}</div>
                         <div className="text-xs text-gray-400 mt-0.5">{u.empreendimento}</div>
                       </td>
 
@@ -239,7 +239,7 @@ function ObrasPage() {
                       <td className="px-4 py-4">
                         <span className={`inline-flex rounded-full px-2.5 py-1 text-[11px] font-semibold ${
                           u.pacote === "Premium"
-                            ? "bg-[#00153e]/10 text-[#00153e]"
+                            ? "bg-[#1a1f3c]/10 text-[#1a1f3c]"
                             : u.pacote === "Plus"
                             ? "bg-blue-50 text-blue-700"
                             : "bg-gray-100 text-gray-600"
@@ -289,8 +289,8 @@ function ObrasPage() {
                               <span className="flex items-center gap-1.5 text-emerald-600">
                                 <span className="h-2 w-2 rounded-full bg-emerald-500" /> Finalizado
                               </span>
-                              <span className="flex items-center gap-1.5 text-[#00153e]">
-                                <span className="h-2 w-2 rounded-full bg-[#00153e]" /> Em andamento
+                              <span className="flex items-center gap-1.5 text-[#1a1f3c]">
+                                <span className="h-2 w-2 rounded-full bg-[#1a1f3c]" /> Em andamento
                               </span>
                               <span className="flex items-center gap-1.5 text-gray-400">
                                 <span className="h-2 w-2 rounded-full bg-gray-200" /> Não iniciado

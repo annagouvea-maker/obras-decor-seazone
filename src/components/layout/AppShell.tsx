@@ -11,11 +11,11 @@ export function AppShell({
   children: ReactNode;
 }) {
   return (
-    <div className="min-h-screen flex w-full bg-[#f4f6fb]">
+    <div className="min-h-screen flex w-full bg-[#eef0f1]">
       <Sidebar />
       <main className="flex-1 min-w-0 flex flex-col">
-        <header className="bg-white border-b border-black/5 px-8 py-5">
-          <h1 className="text-xl font-bold tracking-tight text-[#00153e]">{title}</h1>
+        <header className="bg-[#eef0f1] border-b border-black/5 px-8 py-5">
+          <h1 className="text-xl font-medium tracking-tight text-[#1a1f3c]">{title}</h1>
           {subtitle && (
             <p className="text-sm text-muted-foreground mt-0.5">{subtitle}</p>
           )}
