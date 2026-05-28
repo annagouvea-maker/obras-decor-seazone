@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ObrasRouteImport } from './routes/obras'
 import { Route as ComprasRouteImport } from './routes/compras'
+import { Route as AdmRouteImport } from './routes/adm'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ObrasIdRouteImport } from './routes/obras.$id'
 
@@ -22,6 +23,11 @@ const ObrasRoute = ObrasRouteImport.update({
 const ComprasRoute = ComprasRouteImport.update({
   id: '/compras',
   path: '/compras',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdmRoute = AdmRouteImport.update({
+  id: '/adm',
+  path: '/adm',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -37,12 +43,14 @@ const ObrasIdRoute = ObrasIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/adm': typeof AdmRoute
   '/compras': typeof ComprasRoute
   '/obras': typeof ObrasRouteWithChildren
   '/obras/$id': typeof ObrasIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/adm': typeof AdmRoute
   '/compras': typeof ComprasRoute
   '/obras': typeof ObrasRouteWithChildren
   '/obras/$id': typeof ObrasIdRoute
@@ -50,20 +58,22 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/adm': typeof AdmRoute
   '/compras': typeof ComprasRoute
   '/obras': typeof ObrasRouteWithChildren
   '/obras/$id': typeof ObrasIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/compras' | '/obras' | '/obras/$id'
+  fullPaths: '/' | '/adm' | '/compras' | '/obras' | '/obras/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/compras' | '/obras' | '/obras/$id'
-  id: '__root__' | '/' | '/compras' | '/obras' | '/obras/$id'
+  to: '/' | '/adm' | '/compras' | '/obras' | '/obras/$id'
+  id: '__root__' | '/' | '/adm' | '/compras' | '/obras' | '/obras/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdmRoute: typeof AdmRoute
   ComprasRoute: typeof ComprasRoute
   ObrasRoute: typeof ObrasRouteWithChildren
 }
@@ -82,6 +92,13 @@ declare module '@tanstack/react-router' {
       path: '/compras'
       fullPath: '/compras'
       preLoaderRoute: typeof ComprasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/adm': {
+      id: '/adm'
+      path: '/adm'
+      fullPath: '/adm'
+      preLoaderRoute: typeof AdmRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -113,19 +130,10 @@ const ObrasRouteWithChildren = ObrasRoute._addFileChildren(ObrasRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdmRoute: AdmRoute,
   ComprasRoute: ComprasRoute,
   ObrasRoute: ObrasRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

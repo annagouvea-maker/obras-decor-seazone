@@ -84,7 +84,7 @@ function ComprasPage() {
           <div className="text-[11px] font-semibold text-gray-400 uppercase tracking-wide mb-3">
             Aguardando Entrega
           </div>
-          <div className="text-2xl font-semibold tabular-nums text-[#c9a020]">
+          <div className="text-2xl font-semibold tabular-nums text-[#fc605b]">
             {totalAguardando} <span className="text-sm font-normal text-gray-400">itens</span>
           </div>
         </div>
@@ -143,13 +143,13 @@ function ComprasPage() {
         <div className="overflow-x-auto">
           <table className="w-full text-sm table-fixed">
             <colgroup>
-              <col className="w-32" />   {/* Empreendimento */}
-              <col className="w-24" />   {/* Categoria */}
-              <col className="w-44" />   {/* Produto */}
-              <col className="w-12" />   {/* Qtde */}
-              <col className="w-20" />   {/* Unidades */}
-              <col className="w-28" />   {/* Valor Total */}
-              <col className="w-28" />   {/* Status */}
+              <col className="w-[14%]" />   {/* Empreendimento */}
+              <col className="w-[11%]" />   {/* Categoria */}
+              <col className="w-[22%]" />   {/* Produto */}
+              <col className="w-[7%]"  />   {/* Qtde */}
+              <col className="w-[22%]" />   {/* Unidades */}
+              <col className="w-[12%]" />   {/* Valor Total */}
+              <col className="w-[12%]" />   {/* Status */}
             </colgroup>
             <thead>
               <tr className="border-b border-gray-100">
@@ -194,8 +194,10 @@ function ComprasPage() {
                   <td className="px-4 py-3 text-right tabular-nums text-sm text-gray-600">
                     {c.qtde}
                   </td>
-                  <td className="px-4 py-3 text-xs text-gray-400 truncate" title={c.unidades}>
-                    {c.unidades || "—"}
+                  <td className="px-4 py-3 text-xs text-gray-500 align-top">
+                    <div className="whitespace-normal break-words leading-snug" title={c.unidades}>
+                      {c.unidades || "—"}
+                    </div>
                   </td>
                   <td className="px-4 py-3 text-right tabular-nums text-sm font-semibold text-[#1a1f3c]">
                     {formatBRL(c.valorTotal)}
