@@ -1,16 +1,16 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { LayoutDashboard, HardHat, ShoppingCart, UserCog } from "lucide-react";
 
-// Constantes de cor para o efeito notch
-const SIDEBAR_BG = "#1a1f3c";
-const PAGE_BG    = "#eef0f1";
-const GOLD       = "#c9a020";
+// Constantes de cor para o efeito notch (paleta oficial Seazone)
+const SIDEBAR_BG = "#171E37";
+const PAGE_BG    = "#F1F3F4";
+const GOLD       = "#DCAB1E";
 
 function SeazoneLogo() {
   return (
     <svg width="52" height="52" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
       {/* Chaminé */}
-      <rect x="62" y="3" width="14" height="30" rx="7" fill="#FC605B" />
+      <rect x="62" y="3" width="14" height="30" rx="7" fill="#fc605b" />
       {/* Casa arredondada com buraco circular */}
       <path
         fillRule="evenodd"
@@ -31,7 +31,7 @@ function SeazoneLogo() {
           a18 18 0 1 0 36 0
           a18 18 0 1 0 -36 0
         "
-        fill="#FC605B"
+        fill="#fc605b"
       />
     </svg>
   );

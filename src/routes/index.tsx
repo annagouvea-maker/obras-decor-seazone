@@ -68,10 +68,10 @@ function VisaoGeral() {
   const statusData = useMemo(
     () =>
       [
-        { name: "Em Dia",        value: stats.emDia,      color: "#1e9bc0" }, // cerulean
-        { name: "Atenção Prazo", value: stats.atencao,    color: "#c9a020" }, // gold
-        { name: "Atrasada",      value: stats.atrasada,   color: "#1aab8b" }, // teal
-        { name: "Concluída",     value: stats.concluidas, color: "#4A6FA5" }, // azul médio
+        { name: "Em Dia",        value: stats.emDia,      color: "#1CA095" }, // verde água
+        { name: "Atenção Prazo", value: stats.atencao,    color: "#DCAB1E" }, // mostarda
+        { name: "Atrasada",      value: stats.atrasada,   color: "#EF4444" }, // vermelho alerta
+        { name: "Concluída",     value: stats.concluidas, color: "#1A9CB9" }, // azul turquesa
       ].filter((d) => d.value > 0),
     [stats],
   );
