@@ -19,13 +19,13 @@ export const Route = createFileRoute("/")({
   component: VisaoGeral,
 });
 
-// Uma cor por empreendimento
+// Uma cor por empreendimento — paleta oficial Seazone Decor
 const EMP_COLORS: Record<string, string> = {
-  "Urubici Spot":     "#fc605b",
-  "Penha Spot":       "#4A90D9",
-  "MOV Perdizes":     "#27AE60",
-  "House Espatódeas": "#F7B731",
-  "House Graça":      "#A55EEA",
+  "Urubici Spot":     "#1e9bc0",  // cerulean
+  "Penha Spot":       "#c9a020",  // gold
+  "MOV Perdizes":     "#1aab8b",  // teal
+  "House Espatódeas": "#4A6FA5",  // azul médio
+  "House Graça":      "#7A9E8C",  // verde-acinzentado
 };
 function empColor(nome: string) {
   return EMP_COLORS[nome] ?? "#1a1f3c";
@@ -46,11 +46,11 @@ function VisaoGeral() {
   }, [unidades]);
 
   const kpiCards = [
-    { label: "Unidades em Obra", value: stats.emObra,    dotColor: "bg-[#1a1f3c]",    textColor: "#1a1f3c", filter: "todos"        },
-    { label: "Concluídas",       value: stats.concluidas, dotColor: "bg-slate-400",   textColor: "#6B7280", filter: "Concluída"    },
-    { label: "Em Dia",           value: stats.emDia,      dotColor: "bg-emerald-500", textColor: "#059669", filter: "Em Dia"       },
-    { label: "Atenção Prazo",    value: stats.atencao,    dotColor: "bg-amber-400",   textColor: "#D97706", filter: "Atenção Prazo"},
-    { label: "Atrasadas",        value: stats.atrasada,   dotColor: "bg-red-500",     textColor: "#DC2626", filter: "Atrasada"     },
+    { label: "Unidades em Obra", value: stats.emObra,     accent: "#1a1f3c", textColor: "#1a1f3c", filter: "todos"         },
+    { label: "Concluídas",       value: stats.concluidas, accent: "#94a3b8", textColor: "#6B7280", filter: "Concluída"     },
+    { label: "Em Dia",           value: stats.emDia,      accent: "#1aab8b", textColor: "#1aab8b", filter: "Em Dia"        },
+    { label: "Atenção Prazo",    value: stats.atencao,    accent: "#c9a020", textColor: "#c9a020", filter: "Atenção Prazo" },
+    { label: "Atrasadas",        value: stats.atrasada,   accent: "#DC2626", textColor: "#DC2626", filter: "Atrasada"      },
   ];
 
   const progressoEmp = useMemo(
@@ -68,8 +68,8 @@ function VisaoGeral() {
   const statusData = useMemo(
     () =>
       [
-        { name: "Em Dia",        value: stats.emDia,      color: "#059669" },
-        { name: "Atenção Prazo", value: stats.atencao,    color: "#D97706" },
+        { name: "Em Dia",        value: stats.emDia,      color: "#1aab8b" },
+        { name: "Atenção Prazo", value: stats.atencao,    color: "#c9a020" },
         { name: "Atrasada",      value: stats.atrasada,   color: "#DC2626" },
         { name: "Concluída",     value: stats.concluidas, color: "#94a3b8" },
       ].filter((d) => d.value > 0),
@@ -90,13 +90,17 @@ function VisaoGeral() {
           <button
             key={k.label}
             onClick={() => navigate({ to: "/obras", search: { status: k.filter } })}
-            className="group bg-white rounded-2xl p-5 text-left shadow-sm border border-black/5 hover:shadow-md hover:-translate-y-0.5 transition-all duration-150"
+            className="group bg-white rounded-2xl p-5 text-left shadow-sm border border-black/5 hover:shadow-md hover:-translate-y-0.5 transition-all duration-150 relative overflow-hidden"
           >
-            <div className="flex items-center justify-between mb-3">
+            {/* Barra de acento superior */}
+            <div
+              className="absolute top-0 left-0 right-0 h-[3px] rounded-t-2xl"
+              style={{ background: k.accent }}
+            />
+            <div className="mb-3 mt-1">
               <span className="text-[11px] font-semibold text-gray-400 uppercase tracking-wide leading-tight">
                 {k.label}
               </span>
-              <span className={`h-2 w-2 rounded-full shrink-0 ${k.dotColor}`} />
             </div>
             <div className="text-3xl font-semibold tabular-nums" style={{ color: k.textColor }}>
               {k.value}
@@ -222,7 +226,7 @@ function VisaoGeral() {
             {alertas.map((u) => {
               const atrasada    = u.status === "Atrasada";
               const Icon        = atrasada ? AlertCircle : AlertTriangle;
-              const accentColor = atrasada ? "#DC2626" : "#D97706";
+              const accentColor = atrasada ? "#DC2626" : "#c9a020";
               return (
                 <Link
                   key={u.empreendimento + u.unidade}

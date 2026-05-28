@@ -65,38 +65,6 @@ export function Sidebar() {
           return (
             <div key={it.to} className="relative mb-0.5">
 
-              {active && (
-                <>
-                  {/*
-                    Canto côncavo SUPERIOR:
-                    - outer bg = sidebar dark  (a cor de trás)
-                    - inner bg = page bg com rounded-tl-2xl
-                    O canto superior-esquerdo do inner fica "aberto", revelando o sidebar dark
-                    e criando a curva côncava onde o fundo da página "sobe" para o item ativo.
-                  */}
-                  <div
-                    className="absolute bottom-full right-0 h-6 w-6 pointer-events-none z-20"
-                    style={{ background: SIDEBAR_BG }}
-                  >
-                    <div
-                      className="absolute inset-0 rounded-tl-2xl"
-                      style={{ background: PAGE_BG }}
-                    />
-                  </div>
-
-                  {/* Canto côncavo INFERIOR */}
-                  <div
-                    className="absolute top-full right-0 h-6 w-6 pointer-events-none z-20"
-                    style={{ background: SIDEBAR_BG }}
-                  >
-                    <div
-                      className="absolute inset-0 rounded-bl-2xl"
-                      style={{ background: PAGE_BG }}
-                    />
-                  </div>
-                </>
-              )}
-
               <Link
                 to={it.to}
                 className="flex items-center gap-3 text-[13px] transition-all duration-150 outline-none"

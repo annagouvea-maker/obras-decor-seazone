@@ -28,18 +28,18 @@ export function AppShell({
 
 export function StatusBadge({ status }: { status: string }) {
   const map: Record<string, { bg: string; fg: string; dot: string; label: string }> = {
-    "Em Dia":        { bg: "bg-emerald-50",  fg: "text-emerald-700", dot: "bg-emerald-500", label: "Em Dia" },
-    "Atenção Prazo": { bg: "bg-amber-50",    fg: "text-amber-700",   dot: "bg-amber-400",   label: "Atenção Prazo" },
-    "Atrasada":      { bg: "bg-red-50",      fg: "text-red-600",     dot: "bg-red-500",     label: "Atrasada" },
-    "Concluída":     { bg: "bg-slate-100",   fg: "text-slate-500",   dot: "bg-slate-400",   label: "Concluída" },
-    "Em Andamento":  { bg: "bg-blue-50",     fg: "text-blue-700",    dot: "bg-blue-400",    label: "Em Andamento" },
-    "Não Iniciado":  { bg: "bg-gray-100",    fg: "text-gray-500",    dot: "bg-gray-300",    label: "Não Iniciado" },
-    "Finalizado":    { bg: "bg-emerald-50",  fg: "text-emerald-700", dot: "bg-emerald-500", label: "Finalizado" },
-    "Entregue":      { bg: "bg-emerald-50",  fg: "text-emerald-700", dot: "bg-emerald-500", label: "Entregue" },
-    "Previsto":      { bg: "bg-blue-50",     fg: "text-blue-600",    dot: "bg-blue-400",    label: "Previsto" },
-    "Pendente":      { bg: "bg-gray-100",    fg: "text-gray-500",    dot: "bg-gray-300",    label: "Pendente" },
-    "Atrasado":      { bg: "bg-red-50",      fg: "text-red-600",     dot: "bg-red-500",     label: "Atrasado" },
-    "Aguardando":    { bg: "bg-gray-100",    fg: "text-gray-500",    dot: "bg-gray-300",    label: "Aguardando" },
+    "Em Dia":        { bg: "bg-[#1aab8b]/10", fg: "text-[#1aab8b]", dot: "bg-[#1aab8b]",  label: "Em Dia" },
+    "Atenção Prazo": { bg: "bg-[#c9a020]/10", fg: "text-[#c9a020]", dot: "bg-[#c9a020]",  label: "Atenção Prazo" },
+    "Atrasada":      { bg: "bg-red-50",        fg: "text-red-600",   dot: "bg-red-500",    label: "Atrasada" },
+    "Concluída":     { bg: "bg-slate-100",     fg: "text-slate-500", dot: "bg-slate-400",  label: "Concluída" },
+    "Em Andamento":  { bg: "bg-[#1e9bc0]/10", fg: "text-[#1e9bc0]", dot: "bg-[#1e9bc0]",  label: "Em Andamento" },
+    "Não Iniciado":  { bg: "bg-gray-100",      fg: "text-gray-500",  dot: "bg-gray-300",   label: "Não Iniciado" },
+    "Finalizado":    { bg: "bg-[#1aab8b]/10", fg: "text-[#1aab8b]", dot: "bg-[#1aab8b]",  label: "Finalizado" },
+    "Entregue":      { bg: "bg-[#1aab8b]/10", fg: "text-[#1aab8b]", dot: "bg-[#1aab8b]",  label: "Entregue" },
+    "Previsto":      { bg: "bg-[#1e9bc0]/10", fg: "text-[#1e9bc0]", dot: "bg-[#1e9bc0]",  label: "Previsto" },
+    "Pendente":      { bg: "bg-gray-100",      fg: "text-gray-500",  dot: "bg-gray-300",   label: "Pendente" },
+    "Atrasado":      { bg: "bg-red-50",        fg: "text-red-600",   dot: "bg-red-500",    label: "Atrasado" },
+    "Aguardando":    { bg: "bg-gray-100",      fg: "text-gray-500",  dot: "bg-gray-300",   label: "Aguardando" },
   };
   const s = map[status] ?? map["Não Iniciado"];
   return (
