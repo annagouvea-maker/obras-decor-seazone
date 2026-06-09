@@ -105,6 +105,8 @@ function VisaoGeral() {
     [stats],
   );
 
+  const unitData = useMemo(() => toUnitData(unidades), [unidades]);
+
   const alertas = useMemo(
     () => unidades.filter((u) => u.status === "Atenção Prazo" || u.status === "Atrasada"),
     [unidades],
