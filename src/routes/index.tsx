@@ -33,7 +33,7 @@ function empColor(nome: string) {
   return EMP_COLORS[nome] ?? "#1a1f3c";
 }
 
-function toUnitData(unidades: typeof useSheetData extends () => infer R ? R["unidades"] : never): UnitData[] {
+function toUnitData(unidades: Unidade[]): UnitData[] {
   return unidades.map((u) => {
     const etapas = etapasParaUnidade(u.percentual);
     const pers = personalizacaoUnidade(u);
