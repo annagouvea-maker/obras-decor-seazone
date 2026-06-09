@@ -33,6 +33,33 @@ function empColor(nome: string) {
   return EMP_COLORS[nome] ?? "#1a1f3c";
 }
 
+function toUnitData(unidades: typeof useSheetData extends () => infer R ? R["unidades"] : never): UnitData[] {
+  return unidades.map((u) => {
+    const etapas = etapasParaUnidade(u.percentual);
+    const pers = personalizacaoUnidade(u);
+    const alertas: string[] = [];
+    if (u.status === "Atrasada") alertas.push("Obra atrasada");
+    if (u.status === "Atenção Prazo") alertas.push("Atenção ao prazo");
+    return {
+      emp: u.empreendimento,
+      und: u.unidade,
+      adm: u.adm,
+      pacote: u.pacote,
+      pers: pers.itensExtras.length > 0,
+      pct: u.percentual,
+      prazo: u.prazo,
+      alertas: alertas.length ? alertas : undefined,
+      pendentes: etapas
+        .filter((e) => e.status !== "Finalizado")
+        .map((e) => ({
+          nome: e.nome,
+          status: e.status,
+          pct: e.status === "Em Andamento" ? Math.min(100, Math.max(0, u.percentual)) : 0,
+        })),
+    };
+  });
+}
+
 function VisaoGeral() {
   const { unidades } = useSheetData();
   const navigate = useNavigate();
