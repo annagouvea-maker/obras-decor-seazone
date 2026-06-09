@@ -246,6 +246,11 @@ function VisaoGeral() {
         </div>
       </div>
 
+      {/* ── Análise IA ────────────────────────────────────────────── */}
+      <div className="mb-8">
+        <AIAgentPanel units={unitData} />
+      </div>
+
       {/* ── Alertas ───────────────────────────────────────────────── */}
       {alertas.length > 0 && (
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-black/5">
