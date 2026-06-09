@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMemo } from "react";
 import { AppShell, StatusBadge } from "@/components/layout/AppShell";
-import { EMPREENDIMENTOS, unidadeSlug, etapasParaUnidade, personalizacaoUnidade } from "@/data/seazone";
+import { EMPREENDIMENTOS, unidadeSlug, etapasParaUnidade, personalizacaoUnidade, type Unidade } from "@/data/seazone";
 import { useSheetData } from "@/hooks/useSheetData";
 import { AIAgentPanel } from "@/components/AIAgentPanel";
 import { UnitData } from "@/hooks/useAIAnalysis";
