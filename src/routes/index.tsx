@@ -1,10 +1,8 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMemo } from "react";
 import { AppShell, StatusBadge } from "@/components/layout/AppShell";
-import { EMPREENDIMENTOS, unidadeSlug, etapasParaUnidade, personalizacaoUnidade, type Unidade } from "@/data/seazone";
+import { EMPREENDIMENTOS, unidadeSlug } from "@/data/seazone";
 import { useSheetData } from "@/hooks/useSheetData";
-import { AIAgentPanel } from "@/components/AIAgentPanel";
-import { UnitData } from "@/hooks/useAIAnalysis";
 import {
   BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, Cell,
   PieChart, Pie, Legend,
@@ -23,41 +21,14 @@ export const Route = createFileRoute("/")({
 
 // Uma cor por empreendimento — paleta oficial Seazone Decor
 const EMP_COLORS: Record<string, string> = {
-  "Urubici Spot":     "#1e9bc0",  // cerulean
-  "Penha Spot":       "#c9a020",  // gold
-  "MOV Perdizes":     "#1aab8b",  // teal
-  "House Espatódeas": "#171E37",  // navy oficial Seazone
-  "House Graça":      "#7A9E8C",  // verde-acinzentado
+  "Urubici Spot": "#1e9bc0", // cerulean
+  "Penha Spot": "#c9a020", // gold
+  "MOV Perdizes": "#1aab8b", // teal
+  "House Espatódeas": "#171E37", // navy oficial Seazone
+  "House Graça": "#7A9E8C", // verde-acinzentado
 };
 function empColor(nome: string) {
   return EMP_COLORS[nome] ?? "#1a1f3c";
-}
-
-function toUnitData(unidades: Unidade[]): UnitData[] {
-  return unidades.map((u) => {
-    const etapas = etapasParaUnidade(u.percentual);
-    const pers = personalizacaoUnidade(u);
-    const alertas: string[] = [];
-    if (u.status === "Atrasada") alertas.push("Obra atrasada");
-    if (u.status === "Atenção Prazo") alertas.push("Atenção ao prazo");
-    return {
-      emp: u.empreendimento,
-      und: u.unidade,
-      adm: u.adm,
-      pacote: u.pacote,
-      pers: pers.itensExtras.length > 0,
-      pct: u.percentual,
-      prazo: u.prazo,
-      alertas: alertas.length ? alertas : undefined,
-      pendentes: etapas
-        .filter((e) => e.status !== "Finalizado")
-        .map((e) => ({
-          nome: e.nome,
-          status: e.status,
-          pct: e.status === "Em Andamento" ? Math.min(100, Math.max(0, u.percentual)) : 0,
-        })),
-    };
-  });
 }
 
 function VisaoGeral() {
@@ -65,28 +36,28 @@ function VisaoGeral() {
   const navigate = useNavigate();
 
   const stats = useMemo(() => {
-    const total      = unidades.length;
+    const total = unidades.length;
     const concluidas = unidades.filter((u) => u.status === "Concluída").length;
-    const emObra     = total - concluidas;
-    const emDia      = unidades.filter((u) => u.status === "Em Dia").length;
-    const atencao    = unidades.filter((u) => u.status === "Atenção Prazo").length;
-    const atrasada   = unidades.filter((u) => u.status === "Atrasada").length;
+    const emObra = total - concluidas;
+    const emDia = unidades.filter((u) => u.status === "Em Dia").length;
+    const atencao = unidades.filter((u) => u.status === "Atenção Prazo").length;
+    const atrasada = unidades.filter((u) => u.status === "Atrasada").length;
     return { total, concluidas, emObra, emDia, atencao, atrasada };
   }, [unidades]);
 
   const kpiCards = [
-    { label: "Unidades em Obra", value: stats.emObra,     accent: "#1a1f3c", textColor: "#1a1f3c", filter: "todos"         },
-    { label: "Concluídas",       value: stats.concluidas, accent: "#94a3b8", textColor: "#6B7280", filter: "Concluída"     },
-    { label: "Em Dia",           value: stats.emDia,      accent: "#1aab8b", textColor: "#1aab8b", filter: "Em Dia"        },
-    { label: "Atenção Prazo",    value: stats.atencao,    accent: "#c9a020", textColor: "#c9a020", filter: "Atenção Prazo" },
-    { label: "Atrasadas",        value: stats.atrasada,   accent: "#DC2626", textColor: "#DC2626", filter: "Atrasada"      },
+    { label: "Unidades em Obra", value: stats.emObra, accent: "#1a1f3c", textColor: "#1a1f3c", filter: "todos" },
+    { label: "Concluídas", value: stats.concluidas, accent: "#94a3b8", textColor: "#6B7280", filter: "Concluída" },
+    { label: "Em Dia", value: stats.emDia, accent: "#1aab8b", textColor: "#1aab8b", filter: "Em Dia" },
+    { label: "Atenção Prazo", value: stats.atencao, accent: "#c9a020", textColor: "#c9a020", filter: "Atenção Prazo" },
+    { label: "Atrasadas", value: stats.atrasada, accent: "#DC2626", textColor: "#DC2626", filter: "Atrasada" },
   ];
 
   const progressoEmp = useMemo(
     () =>
       EMPREENDIMENTOS.map((nome) => {
         const units = unidades.filter((u) => u.empreendimento === nome);
-        const avg   = units.length > 0
+        const avg = units.length > 0
           ? Math.round(units.reduce((s, u) => s + u.percentual, 0) / units.length)
           : 0;
         return { nome, valor: avg };
@@ -97,15 +68,13 @@ function VisaoGeral() {
   const statusData = useMemo(
     () =>
       [
-        { name: "Em Dia",        value: stats.emDia,      color: "#1CA095" }, // verde água
-        { name: "Atenção Prazo", value: stats.atencao,    color: "#DCAB1E" }, // mostarda
-        { name: "Atrasada",      value: stats.atrasada,   color: "#EF4444" }, // vermelho alerta
-        { name: "Concluída",     value: stats.concluidas, color: "#94a3b8" }, // mesmo cinza do KPI "Concluídas"
+        { name: "Em Dia", value: stats.emDia, color: "#1CA095" }, // verde água
+        { name: "Atenção Prazo", value: stats.atencao, color: "#DCAB1E" }, // mostarda
+        { name: "Atrasada", value: stats.atrasada, color: "#EF4444" }, // vermelho alerta
+        { name: "Concluída", value: stats.concluidas, color: "#94a3b8" }, // mesmo cinza do KPI "Concluídas"
       ].filter((d) => d.value > 0),
     [stats],
   );
-
-  const unitData = useMemo(() => toUnitData(unidades), [unidades]);
 
   const alertas = useMemo(
     () => unidades.filter((u) => u.status === "Atenção Prazo" || u.status === "Atrasada"),
@@ -246,11 +215,6 @@ function VisaoGeral() {
         </div>
       </div>
 
-      {/* ── Análise IA ────────────────────────────────────────────── */}
-      <div className="mb-8">
-        <AIAgentPanel units={unitData} />
-      </div>
-
       {/* ── Alertas ───────────────────────────────────────────────── */}
       {alertas.length > 0 && (
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-black/5">
@@ -260,8 +224,8 @@ function VisaoGeral() {
           </p>
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
             {alertas.map((u) => {
-              const atrasada    = u.status === "Atrasada";
-              const Icon        = atrasada ? AlertCircle : AlertTriangle;
+              const atrasada = u.status === "Atrasada";
+              const Icon = atrasada ? AlertCircle : AlertTriangle;
               const accentColor = atrasada ? "#DC2626" : "#c9a020";
               return (
                 <Link
