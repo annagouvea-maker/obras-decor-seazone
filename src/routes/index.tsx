@@ -1,8 +1,10 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMemo } from "react";
 import { AppShell, StatusBadge } from "@/components/layout/AppShell";
-import { EMPREENDIMENTOS, unidadeSlug } from "@/data/seazone";
+import { EMPREENDIMENTOS, unidadeSlug, etapasParaUnidade, personalizacaoUnidade, type Unidade } from "@/data/seazone";
 import { useSheetData } from "@/hooks/useSheetData";
+import { AIAgentPanel } from "@/components/AIAgentPanel";
+import { UnitData } from "@/hooks/useAIAnalysis";
 import {
   BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, Cell,
   PieChart, Pie, Legend,
@@ -29,6 +31,33 @@ const EMP_COLORS: Record<string, string> = {
 };
 function empColor(nome: string) {
   return EMP_COLORS[nome] ?? "#1a1f3c";
+}
+
+function toUnitData(unidades: Unidade[]): UnitData[] {
+  return unidades.map((u) => {
+    const etapas = etapasParaUnidade(u.percentual);
+    const pers = personalizacaoUnidade(u);
+    const alertas: string[] = [];
+    if (u.status === "Atrasada") alertas.push("Obra atrasada");
+    if (u.status === "Atenção Prazo") alertas.push("Atenção ao prazo");
+    return {
+      emp: u.empreendimento,
+      und: u.unidade,
+      adm: u.adm,
+      pacote: u.pacote,
+      pers: pers.itensExtras.length > 0,
+      pct: u.percentual,
+      prazo: u.prazo,
+      alertas: alertas.length ? alertas : undefined,
+      pendentes: etapas
+        .filter((e) => e.status !== "Finalizado")
+        .map((e) => ({
+          nome: e.nome,
+          status: e.status,
+          pct: e.status === "Em Andamento" ? Math.min(100, Math.max(0, u.percentual)) : 0,
+        })),
+    };
+  });
 }
 
 function VisaoGeral() {
@@ -75,6 +104,8 @@ function VisaoGeral() {
       ].filter((d) => d.value > 0),
     [stats],
   );
+
+  const unitData = useMemo(() => toUnitData(unidades), [unidades]);
 
   const alertas = useMemo(
     () => unidades.filter((u) => u.status === "Atenção Prazo" || u.status === "Atrasada"),
@@ -213,6 +244,11 @@ function VisaoGeral() {
             </ResponsiveContainer>
           </div>
         </div>
+      </div>
+
+      {/* ── Análise IA ────────────────────────────────────────────── */}
+      <div className="mb-8">
+        <AIAgentPanel units={unitData} />
       </div>
 
       {/* ── Alertas ───────────────────────────────────────────────── */}
