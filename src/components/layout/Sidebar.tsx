@@ -42,6 +42,7 @@ const items = [
   { to: "/obras",   label: "Obras",       icon: HardHat },
   { to: "/compras", label: "Compras",     icon: ShoppingCart },
   { to: "/adm",     label: "Área do ADM", icon: UserCog },
+  { to: "/radar-risco", label: "Radar de Risco", icon: ShieldAlert },
 ];
 
 export function Sidebar() {
