@@ -9,12 +9,18 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as RadarRiscoRouteImport } from './routes/radar-risco'
 import { Route as ObrasRouteImport } from './routes/obras'
 import { Route as ComprasRouteImport } from './routes/compras'
 import { Route as AdmRouteImport } from './routes/adm'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ObrasIdRouteImport } from './routes/obras.$id'
 
+const RadarRiscoRoute = RadarRiscoRouteImport.update({
+  id: '/radar-risco',
+  path: '/radar-risco',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ObrasRoute = ObrasRouteImport.update({
   id: '/obras',
   path: '/obras',
@@ -46,6 +52,7 @@ export interface FileRoutesByFullPath {
   '/adm': typeof AdmRoute
   '/compras': typeof ComprasRoute
   '/obras': typeof ObrasRouteWithChildren
+  '/radar-risco': typeof RadarRiscoRoute
   '/obras/$id': typeof ObrasIdRoute
 }
 export interface FileRoutesByTo {
@@ -53,6 +60,7 @@ export interface FileRoutesByTo {
   '/adm': typeof AdmRoute
   '/compras': typeof ComprasRoute
   '/obras': typeof ObrasRouteWithChildren
+  '/radar-risco': typeof RadarRiscoRoute
   '/obras/$id': typeof ObrasIdRoute
 }
 export interface FileRoutesById {
@@ -61,14 +69,28 @@ export interface FileRoutesById {
   '/adm': typeof AdmRoute
   '/compras': typeof ComprasRoute
   '/obras': typeof ObrasRouteWithChildren
+  '/radar-risco': typeof RadarRiscoRoute
   '/obras/$id': typeof ObrasIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/adm' | '/compras' | '/obras' | '/obras/$id'
+  fullPaths:
+    | '/'
+    | '/adm'
+    | '/compras'
+    | '/obras'
+    | '/radar-risco'
+    | '/obras/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/adm' | '/compras' | '/obras' | '/obras/$id'
-  id: '__root__' | '/' | '/adm' | '/compras' | '/obras' | '/obras/$id'
+  to: '/' | '/adm' | '/compras' | '/obras' | '/radar-risco' | '/obras/$id'
+  id:
+    | '__root__'
+    | '/'
+    | '/adm'
+    | '/compras'
+    | '/obras'
+    | '/radar-risco'
+    | '/obras/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -76,10 +98,18 @@ export interface RootRouteChildren {
   AdmRoute: typeof AdmRoute
   ComprasRoute: typeof ComprasRoute
   ObrasRoute: typeof ObrasRouteWithChildren
+  RadarRiscoRoute: typeof RadarRiscoRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/radar-risco': {
+      id: '/radar-risco'
+      path: '/radar-risco'
+      fullPath: '/radar-risco'
+      preLoaderRoute: typeof RadarRiscoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/obras': {
       id: '/obras'
       path: '/obras'
@@ -133,6 +163,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdmRoute: AdmRoute,
   ComprasRoute: ComprasRoute,
   ObrasRoute: ObrasRouteWithChildren,
+  RadarRiscoRoute: RadarRiscoRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
