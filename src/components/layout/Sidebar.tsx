@@ -1,5 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { LayoutDashboard, HardHat, ShoppingCart, UserCog } from "lucide-react";
+import { LayoutDashboard, HardHat, ShoppingCart, UserCog, ShieldAlert } from "lucide-react";
 
 // Constantes de cor para o efeito notch (paleta oficial Seazone)
 const SIDEBAR_BG = "#171E37";
