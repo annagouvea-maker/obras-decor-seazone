@@ -63,7 +63,7 @@ function calcRisk(u: Omit<RiskUnit, "risk">): RiskScore {
   const factors: RiskFactor[] = [];
 
   const st = u.statusObra;
-  if (st.includes("ATRASADA"))       { s += 30; factors.push({ label: "Obra Atrasada", color: "red" }); }
+  if (st.includes("ATRASADA"))       { s += 40; factors.push({ label: "Obra Atrasada", color: "red" }); }
   else if (st.includes("ATENÇÃO"))   { s += 15; factors.push({ label: "Atenção: Prazo Final", color: "amber" }); }
   else if (st.includes("AGUARDANDO")){ s += 5;  factors.push({ label: "Aguardando Início", color: "amber" }); }
   else if (st.includes("ATRASO"))    { s += 25; factors.push({ label: "Finalizada com Atraso", color: "amber" }); }
@@ -86,9 +86,9 @@ function calcRisk(u: Omit<RiskUnit, "risk">): RiskScore {
   else if (p < 85) { s += 6; }
   else if (p < 95) { s += 2; }
 
-  const overdue = u.tasks.filter(
-    (t) =>
-      ["Em Andamento", "Pendente"].includes(t.status) &&
+ const overdue = u.tasks.filter(
+  (t) =>
+    ["Em Andamento", "Pendente", "Não iniciado"].includes(t.status) &&
       !t.tr &&
       parseDate(t.tp) !== null &&
       parseDate(t.tp)! < TODAY,
