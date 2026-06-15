@@ -22,7 +22,7 @@ export interface RiskTask {
 
 export interface RiskFactor {
   label: string;
-  color: "red" | "amber";
+  color: "red" | "amber" | "green";
 }
 
 export interface RiskScore {
