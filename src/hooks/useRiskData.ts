@@ -63,6 +63,15 @@ function calcRisk(u: Omit<RiskUnit, "risk">): RiskScore {
   const factors: RiskFactor[] = [];
 
   const st = u.statusObra;
+  // Unidades finalizadas não têm mais risco ativo
+if (st.includes("FINALIZADA")) {
+  return {
+    ...u,
+    score: 0,
+    risco: "Baixo" as const,
+    factors: [{ label: "Obra Finalizada", color: "green" as const }],
+  };
+}
   if (st.includes("ATRASADA"))       { s += 40; factors.push({ label: "Obra Atrasada", color: "red" }); }
   else if (st.includes("ATENÇÃO"))   { s += 15; factors.push({ label: "Atenção: Prazo Final", color: "amber" }); }
   else if (st.includes("AGUARDANDO")){ s += 5;  factors.push({ label: "Aguardando Início", color: "amber" }); }
