@@ -1,6 +1,6 @@
 export type StatusObra = "Em Dia" | "Atenção Prazo" | "Atrasada" | "Concluída";
 export type StatusEtapa = "Finalizado" | "Em Andamento" | "Não Iniciado";
-export type StatusEntrega = "Entregue" | "Previsto" | "Pendente" | "Atrasado";
+export type StatusEntrega = "Entregue" | "Previsto" | "Pendente" | "Atrasado" | "Cancelado" | "Devolvido";
 
 export interface Unidade {
   unidade: string;
