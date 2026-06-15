@@ -22,7 +22,7 @@ export interface RiskTask {
 
 export interface RiskFactor {
   label: string;
-  color: "red" | "amber";
+  color: "red" | "amber" | "green";
 }
 
 export interface RiskScore {
@@ -66,10 +66,10 @@ function calcRisk(u: Omit<RiskUnit, "risk">): RiskScore {
   // Unidades finalizadas não têm mais risco ativo
 if (st.includes("FINALIZADA")) {
   return {
-    ...u,
     score: 0,
-    risco: "Baixo" as const,
-    factors: [{ label: "Obra Finalizada", color: "green" as const }],
+    level: "safe",
+    label: "Baixo",
+    factors: [{ label: "Obra Finalizada", color: "green" }],
   };
 }
   if (st.includes("ATRASADA"))       { s += 40; factors.push({ label: "Obra Atrasada", color: "red" }); }
