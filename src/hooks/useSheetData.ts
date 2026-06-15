@@ -1,13 +1,6 @@
 /**
  * useSheetData — sincronização automática com Google Sheets
- *
- * Busca os dados das planilhas de Obras e Compras via API pública do Google
- * (gviz/tq) sem necessidade de autenticação ou CORS proxy.
- *
- * A cada visita à página, os dados são buscados frescos do Google Sheets.
- * Um cache de 5 minutos no localStorage evita requisições desnecessárias.
  */
-
 import { useState, useEffect, useCallback } from "react";
 import {
   UNIDADES,
@@ -22,29 +15,18 @@ import {
 const OBRAS_SHEET_ID = "1RC6xjHfDDlTtWGMemCRzdVVSdzjHkweSzz14-6qvRwE";
 const OBRAS_GID = "633870424";
 
-const COMPRAS_SHEET_ID = "1nCmDK4k39qk449pZpP9FCYolzW7U17jv6IBtRxPaq3Q";
+const COMPRAS_SHEET_ID = "137ABq7Zxpf0QZmPBY0IlfkGRnvow8rfr4KbFsQbhrqg";
+const COMPRAS_GID = "271446938";
 
-// Abas da planilha de Compras — cada aba é um empreendimento
-// Para adicionar novos empreendimentos: copie o link da aba no Sheets,
-// pegue o gid= no final da URL e adicione aqui.
-const COMPRAS_TABS: { gid: string; empreendimento: string }[] = [
-  { gid: "271446938",  empreendimento: "Urubici Spot" },
-  { gid: "1620193194", empreendimento: "Penha Spot" },
-  { gid: "2075898158", empreendimento: "MOV Perdizes" },
-  // House Espatódeas e House Graça: sem aba de compras no dashboard (intencional)
-];
-
-const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutos
+const CACHE_TTL_MS = 5 * 60 * 1000;
 const CACHE_KEY_OBRAS = "sz_obras_v1";
 const CACHE_KEY_COMPRAS = "sz_compras_v1";
 
-// ─── Tipos internos ───────────────────────────────────────────────────────────
 interface CacheEntry<T> {
   data: T;
-  ts: number; // timestamp de quando foi buscado
+  ts: number;
 }
 
-// ─── Utilitários ─────────────────────────────────────────────────────────────
 function gvizUrl(sheetId: string, gid: string): string {
   return `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json&gid=${gid}`;
 }
@@ -52,30 +34,20 @@ function gvizUrl(sheetId: string, gid: string): string {
 async function fetchRows(sheetId: string, gid: string): Promise<string[][]> {
   const res = await fetch(gvizUrl(sheetId, gid));
   const text = await res.text();
-
-  // A resposta vem com um wrapper JSONP: /*O_o*/\ngoogle.visualization.Query.setResponse({...});
-  // Precisamos extrair só o JSON interno.
   const start = text.indexOf("{");
   const end = text.lastIndexOf("}");
   if (start === -1 || end === -1) throw new Error("Formato inesperado da API Google Sheets");
-
   const json = JSON.parse(text.slice(start, end + 1));
-
-  // Os cabeçalhos ficam nos metadados `cols`, não nas linhas de dados.
-  // Incluímos como primeira linha para que os parsers consigam detectar índices.
   const cols: string[] = (json?.table?.cols ?? []).map((c: any) => (c.label || "").trim());
-
   const tableRows: any[] = json?.table?.rows ?? [];
   const dataRows = tableRows.map((row: any) => {
     const cells: (any | null)[] = row?.c ?? [];
     return cells.map((cell: any) => {
       if (!cell || cell.v === null || cell.v === undefined) return "";
-      // Preferir o valor formatado (cell.f) quando disponível — mantém "75%", datas, etc.
       if (typeof cell.f === "string" && cell.f.trim()) return cell.f.trim();
       return String(cell.v).trim();
     });
   });
-
   return cols.length > 0 ? [cols, ...dataRows] : dataRows;
 }
 
@@ -95,16 +67,12 @@ function setCache<T>(key: string, data: T): void {
   try {
     const entry: CacheEntry<T> = { data, ts: Date.now() };
     localStorage.setItem(key, JSON.stringify(entry));
-  } catch {
-    // localStorage cheio — ignora silenciosamente
-  }
+  } catch {}
 }
 
 // ─── Parser de Obras ─────────────────────────────────────────────────────────
 function parseStatusObra(raw: string): StatusObra {
-  // Normaliza para maiúsculo sem acento para comparação robusta
   const up = raw.toUpperCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
-  // Concluída primeiro — "CONCLUIDA COM ATRASO" não deve virar "Atrasada"
   if (up.includes("CONCLU") || up.includes("FINALIZ") || up.includes("ENTREGUE")) return "Concluída";
   if (up.includes("ATRASAD") || raw.includes("🔴")) return "Atrasada";
   if (up.includes("ATENCAO") || up.includes("ATENÇAO") || raw.includes("⚠️")) return "Atenção Prazo";
@@ -124,21 +92,14 @@ function parseObrasRows(rows: string[][]): Unidade[] {
   let currentId = "";
 
   for (const row of rows) {
-    // Garantir que o array tem colunas suficientes
     while (row.length < 35) row.push("");
-
     const id = row[0];
     const tarefa = row[12];
-
-    // Pular linha de cabeçalho
     if (id === "ID Card Pipefy") continue;
-    // Pular linhas completamente vazias
     if (!id && !tarefa) continue;
-
-    // Início de nova unidade: col 0 tem um ID numérico diferente
     if (id && id !== currentId && /^\d+$/.test(id.replace(/[,. ]/g, ""))) {
       currentId = id;
-      const driveLink = (row[24] || "").trim(); // coluna Y — link da pasta de fotos da unidade
+      const driveLink = (row[24] || "").trim();
       const driveUrl = driveLink.startsWith("https://") ? driveLink : undefined;
       currentUnit = {
         unidade: row[2],
@@ -152,37 +113,33 @@ function parseObrasRows(rows: string[][]): Unidade[] {
         driveUrl,
       };
     }
-
-    // Linha de totais: captura o percentual geral da unidade
     if (tarefa === "Total" && currentUnit) {
       const pctStr = row[19] || "0%";
       const pct = parseInt(pctStr.replace("%", "").replace(",", ".")) || 0;
       currentUnit.percentual = pct;
-
-      // Só adiciona se tiver os dados mínimos
       if (currentUnit.unidade && currentUnit.empreendimento) {
         units.push(currentUnit as Unidade);
       }
       currentUnit = null;
     }
   }
-
   return units;
 }
 
 // ─── Parser de Compras ───────────────────────────────────────────────────────
-function parseStatusEntrega(prazo: string): StatusEntrega {
-  const low = prazo.toLowerCase();
-  if (low.includes("entregue") || low.includes("entregues")) return "Entregue";
+function parseStatusEntrega(raw: string): StatusEntrega {
+  const low = raw.toLowerCase();
+  if (low.includes("entregue") || low.includes("entregues") || low.includes("finalizado")) return "Entregue";
   if (low.includes("atrasad")) return "Atrasado";
+  if (low.includes("cancelad")) return "Cancelado";
+  if (low.includes("devolu")) return "Devolvido";
   if (low.includes("pendente")) return "Pendente";
-  if (!prazo || prazo === "-") return "Pendente";
+  if (!raw || raw === "-") return "Pendente";
   return "Previsto";
 }
 
 function parseBRL(str: string): number {
   if (!str) return 0;
-  // Remove R$, pontos de milhar, espaços e troca vírgula por ponto
   const clean = str
     .replace(/R\$\s*/g, "")
     .replace(/\./g, "")
@@ -191,12 +148,11 @@ function parseBRL(str: string): number {
   return parseFloat(clean) || 0;
 }
 
-function parseComprasRows(rows: string[][], empreendimento: string): Compra[] {
+function parseComprasRows(rows: string[][]): Compra[] {
   const compras: Compra[] = [];
   let headerIdx = -1;
-  let produtoIdx = 2; // padrão: Coluna C (com Categoria em B)
+  let produtoIdx = 3; // padrão: Coluna D (A=Empreendimento, B=TítuloSienge, C=Categoria, D=Produto)
 
-  // Encontrar a linha de cabeçalho — busca "Produto" em qualquer coluna inicial
   for (let i = 0; i < rows.length; i++) {
     const row = rows[i];
     const pIdx = row.findIndex((cell, j) => j <= 6 && cell.trim() === "Produto");
@@ -205,49 +161,47 @@ function parseComprasRows(rows: string[][], empreendimento: string): Compra[] {
       produtoIdx = pIdx;
       break;
     }
-    if (row[0] === "Título Sienge") {
+    if (row[0] === "Empreendimento") {
       headerIdx = i;
       break;
     }
   }
 
-  // Detectar índice da coluna Categoria no cabeçalho
   const headerRow = headerIdx >= 0 ? rows[headerIdx] : [];
-  const catIdx = headerRow.findIndex((c) =>
-    c.trim().toLowerCase().includes("categor")
-  );
+  const catIdx = headerRow.findIndex((c) => c.trim().toLowerCase().includes("categor"));
+  const statusIdx = headerRow.findIndex((c) => c.trim().toLowerCase().includes("status"));
 
-  // Índices relativos ao Produto (estrutura consistente independente de onde "Produto" está)
-  const qtdeIdx    = produtoIdx + 5;  // Qtde
-  const valorIdx   = produtoIdx + 7;  // Valor Total
-  const prazoIdx   = produtoIdx + 19; // Prazo de entrega
-  const fornIdx    = produtoIdx + 24; // Fornecedor
+  const qtdeIdx  = produtoIdx + 5; // Quantidade
+  const valorIdx = produtoIdx + 7; // Valor Total
 
   const dataRows = headerIdx >= 0 ? rows.slice(headerIdx + 1) : rows;
   let counter = 1;
 
   for (const row of dataRows) {
-    while (row.length < 35) row.push("");
+    while (row.length < 30) row.push("");
 
+    const empreendimento = (row[0] || "").trim();
     const produto = (row[produtoIdx] || "").trim();
-    if (!produto) continue;
-    if (produto === "Produto" || produto.includes("Empreendimento:")) continue;
+
+    if (!empreendimento || !produto) continue;
+    if (produto === "Produto") continue;
+    if (empreendimento === "Empreendimento") continue;
 
     const valorTotal = parseBRL(row[valorIdx]);
     const qtde = parseFloat((row[qtdeIdx] || "1").replace(",", ".")) || 1;
-    const prazo = (row[prazoIdx] || "").trim();
+    const rawStatus = statusIdx >= 0 ? (row[statusIdx] || "").trim() : "";
 
     compras.push({
-      codigo: row[0] || `C${String(counter).padStart(3, "0")}`,
+      codigo: row[1] || `C${String(counter).padStart(3, "0")}`,
       categoria: catIdx >= 0 ? (row[catIdx] || "").trim() : "",
       produto,
       especificacoes: (row[produtoIdx + 1] || "").trim(),
       unidades: (row[produtoIdx + 2] || "").trim(),
       qtde,
       valorTotal,
-      prazoEntrega: prazo,
-      status: parseStatusEntrega(prazo),
-      fornecedor: (row[fornIdx] || "").trim(),
+      prazoEntrega: "",
+      status: parseStatusEntrega(rawStatus),
+      fornecedor: "",
       empreendimento,
     });
     counter++;
@@ -286,13 +240,9 @@ export function useSheetData(): SheetDataState {
         setCache(CACHE_KEY_OBRAS, parsed);
       }
 
-      // ── Compras (todas as abas) ──
-      const allCompras: Compra[] = [];
-      for (const tab of COMPRAS_TABS) {
-        const rows = await fetchRows(COMPRAS_SHEET_ID, tab.gid);
-        const tabCompras = parseComprasRows(rows, tab.empreendimento);
-        allCompras.push(...tabCompras);
-      }
+      // ── Compras (aba única com todos os empreendimentos) ──
+      const comprasRows = await fetchRows(COMPRAS_SHEET_ID, COMPRAS_GID);
+      const allCompras = parseComprasRows(comprasRows);
       if (allCompras.length > 0) {
         setCompras(allCompras);
         setCache(CACHE_KEY_COMPRAS, allCompras);
@@ -302,14 +252,12 @@ export function useSheetData(): SheetDataState {
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Erro ao sincronizar planilhas";
       setError(msg);
-      // Em caso de erro, mantém os dados do cache / estáticos — não quebra a UI
       console.error("[useSheetData]", msg);
     } finally {
       setLoading(false);
     }
   }, []);
 
-  // Busca ao montar o componente (se cache expirou)
   useEffect(() => {
     const cachedObras = getCache<Unidade[]>(CACHE_KEY_OBRAS);
     const cachedCompras = getCache<Compra[]>(CACHE_KEY_COMPRAS);
